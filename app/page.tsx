@@ -57,7 +57,7 @@ export default function Home() {
   }, [activeOnly, cardType, domain, maxDifficulty, query]);
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8">
+    <main className="min-h-screen overflow-x-hidden bg-slate-950 text-slate-100 p-4 md:p-8">
       <div className="mx-auto max-w-5xl space-y-4">
         <header className="space-y-1">
           <h1 className="text-2xl md:text-3xl font-bold">Algo Pocket</h1>
@@ -129,17 +129,17 @@ export default function Home() {
             <button
               key={card.id}
               onClick={() => setSelected(card)}
-              className="text-left p-4 rounded-xl border border-slate-800 bg-slate-900 hover:border-sky-500 transition"
+              className="min-w-0 text-left p-4 rounded-xl border border-slate-800 bg-slate-900 hover:border-sky-500 transition"
             >
-              <div className="flex items-center justify-between gap-2">
-                <p className="font-semibold">{card.topic}</p>
-                <span className="text-xs text-slate-400">{card.id}</span>
+              <div className="flex items-start justify-between gap-2 min-w-0">
+                <p className="font-semibold break-words [overflow-wrap:anywhere]">{card.topic}</p>
+                <span className="text-xs text-slate-400 shrink-0">{card.id}</span>
               </div>
-              <p className="mt-1 text-xs text-slate-400">
+              <p className="mt-1 text-xs text-slate-400 break-words [overflow-wrap:anywhere]">
                 {card.domain} · {card.type} · difficulty {card.difficulty}
               </p>
               {card.tags?.length ? (
-                <div className="mt-2 flex flex-wrap gap-1">
+                <div className="mt-2 flex flex-wrap gap-1 min-w-0">
                   {card.tags.map((tag) => (
                     <span
                       key={tag}
@@ -179,14 +179,14 @@ export default function Home() {
               </button>
             </div>
 
-            <article className="space-y-2">
+            <article className="space-y-2 min-w-0">
               <h3 className="font-semibold text-sky-300">Card</h3>
-              <p className="whitespace-pre-wrap text-slate-200 leading-7">{selected.front}</p>
+              <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-slate-200 leading-7">{selected.front}</p>
             </article>
 
-            <article className="space-y-2">
+            <article className="space-y-2 min-w-0">
               <h3 className="font-semibold text-emerald-300">Check</h3>
-              <p className="whitespace-pre-wrap text-slate-200 leading-7">{selected.check}</p>
+              <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-slate-200 leading-7">{selected.check}</p>
             </article>
           </div>
         </div>
