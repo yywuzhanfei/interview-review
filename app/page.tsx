@@ -131,8 +131,8 @@ export default function Home() {
               onClick={() => setSelected(card)}
               className="min-w-0 text-left p-4 rounded-xl border border-slate-800 bg-slate-900 hover:border-sky-500 transition"
             >
-              <div className="flex items-start justify-between gap-2 min-w-0">
-                <p className="font-semibold break-words [overflow-wrap:anywhere]">{card.topic}</p>
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-2 min-w-0">
+                <p className="font-semibold min-w-0 flex-1 break-words [overflow-wrap:anywhere]">{card.topic}</p>
                 <span className="text-xs text-slate-400 shrink-0">{card.id}</span>
               </div>
               <p className="mt-1 text-xs text-slate-400 break-words [overflow-wrap:anywhere]">
