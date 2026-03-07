@@ -197,7 +197,7 @@
     ],
     "cooldown_hours": 24,
     "is_active": true,
-    "front_zh": "【待中文化】\nTo find the longest consecutive sequence in an unsorted array in O(n), put all numbers into a hash set for O(1) membership checks. Only start counting from numbers that are sequence starts: a number x is a start if x-1 is not in the set. From each start, extend forward (x+1, x+2, ...) until the sequence breaks, and track the maximum length. This avoids repeated work because non-start numbers belong to a sequence that will be counted from its smallest element.",
+    "front_zh": "最长连续序列（Longest Consecutive Sequence）最优解是 **HashSet + 只从序列起点扩展**。\n\n核心规则：\n- 只有当 `x-1` 不在集合中时，`x` 才是一个序列起点\n- 从起点往右扩展：`x+1, x+2, ...`\n\n这样能避免重复扫描，整体 `O(n)`。\n\n```python\ndef longestConsecutive(nums):\n    s = set(nums)\n    best = 0\n\n    for x in s:\n        if x - 1 in s:\n            continue  # 不是起点，跳过\n\n        y = x\n        while y in s:\n            y += 1\n\n        best = max(best, y - x)\n\n    return best\n```\n\n为什么不是 `O(n^2)`：\n- 每个元素最多被“扩展 while”命中一次（按序列归属），不会被重复从中间起点反复扫。",
     "check_q_en": "Why do we only start expanding from x when (x - 1) is not in the set, and how does this prevent O(n^2) behavior?",
     "check_a_en": "If x-1 exists, x is not the start of its sequence, so that sequence will be counted when we start from its smallest element. By expanding only from starts, each number is visited at most once by the expansion loop overall, avoiding repeated scans that cause O(n^2)."
   },
@@ -215,7 +215,7 @@
     ],
     "cooldown_hours": 24,
     "is_active": true,
-    "front_zh": "【待中文化】\nWhen comparing characters under relaxed rules, first filter to alphanumeric characters, then normalize case. Alphanumeric filtering ensures punctuation does not affect logic, while lowercasing ensures case-insensitive comparison. In Python, this is often implemented using explicit ASCII checks or built-in helpers before comparison.",
+    "front_zh": "做“忽略符号 + 忽略大小写”的字符比较时，顺序要固定：\n\n1) 先过滤非字母数字\n2) 再统一大小写\n3) 最后比较\n\n```python\ndef normalize(ch: str) -> str:\n    if ch.isalnum():\n        return ch.lower()\n    return \"\"\n```\n\n如果先比较再过滤，会把本应忽略的字符（空格、标点）误计入逻辑，导致结果错误。",
     "check_q_en": "Why must character filtering (alphanumeric) be done before lowercasing and comparison?",
     "check_a_en": "Because punctuation/spaces should be ignored entirely; you need to skip them before comparing. After filtering to valid characters, normalizing case (e.g., lowercasing) ensures 'A' and 'a' are treated as equal under case-insensitive rules."
   },
@@ -233,7 +233,7 @@
     ],
     "cooldown_hours": 24,
     "is_active": true,
-    "front_zh": "【待中文化】\nFor 3Sum, sort the array, then fix an index i and solve a 2Sum (two pointers) on the subarray (i+1..end). The key is deduplication: (1) skip duplicate values for the fixed i to avoid generating identical triplets across iterations, and (2) after finding a valid pair, move pointers and skip duplicates (commonly skip duplicates on left after left++). These rules ensure uniqueness without missing valid combinations.",
+    "front_zh": "3Sum 的稳定解法：**排序 + 固定 i + 双指针**，并且要做两层去重。\n\n两层去重：\n- 外层：`i` 与前一个相同就跳过\n- 内层：命中后移动指针时跳过重复值\n\n```python\ndef threeSum(nums):\n    nums.sort()\n    n = len(nums)\n    ans = []\n\n    for i in range(n - 2):\n        if i > 0 and nums[i] == nums[i - 1]:\n            continue\n\n        l, r = i + 1, n - 1\n        while l < r:\n            s = nums[i] + nums[l] + nums[r]\n            if s < 0:\n                l += 1\n            elif s > 0:\n                r -= 1\n            else:\n                ans.append([nums[i], nums[l], nums[r]])\n                l += 1\n                r -= 1\n                while l < r and nums[l] == nums[l - 1]:\n                    l += 1\n                while l < r and nums[r] == nums[r + 1]:\n                    r -= 1\n\n    return ans\n```\n\n记忆点：不去重就会重复三元组；只做一层去重也不够。",
     "check_q_en": "Why must we dedupe at both levels (skip duplicate i, and skip duplicate left/right after a match) to avoid repeated triplets?",
     "check_a_en": "Duplicate i values would anchor the same first element and reproduce the same pairs, creating identical triplets across iterations. Even with unique i, duplicate values at left/right after a match would generate the same second/third elements again. Deduping both levels ensures each unique triplet is emitted once."
   },
@@ -251,7 +251,7 @@
     ],
     "cooldown_hours": 24,
     "is_active": true,
-    "front_zh": "【待中文化】\nFor the max water container problem, use two pointers at the ends. The area is limited by the shorter height: area = min(h[l], h[r]) * (r - l). To possibly increase area while width shrinks, you must move the pointer at the shorter height. Moving the taller side cannot increase the limiting height and only decreases width, so it cannot lead to a better result.",
+    "front_zh": "盛最多水容器（Container With Most Water）的贪心关键：\n\n当前面积：`min(h[l], h[r]) * (r-l)`\n\n- 面积由较短板决定\n- 宽度每次必然减少\n- 所以必须移动较短的一侧，才有机会提高短板\n\n```python\ndef maxArea(h):\n    l, r = 0, len(h) - 1\n    best = 0\n\n    while l < r:\n        best = max(best, min(h[l], h[r]) * (r - l))\n        if h[l] <= h[r]:\n            l += 1\n        else:\n            r -= 1\n\n    return best\n```\n\n移动较高侧在当前时刻不会带来收益（短板没变、宽度还减小）。",
     "check_q_en": "Why is it always safe to move the pointer on the shorter side, and why can moving the taller side never help at that moment?",
     "check_a_en": "The current area is capped by the shorter height. Moving the taller side cannot increase the limiting (shorter) height, but it does reduce width, so the area cannot improve. Moving the shorter side is the only move that might increase the limiting height enough to offset the reduced width."
   },
@@ -269,7 +269,7 @@
     ],
     "cooldown_hours": 24,
     "is_active": true,
-    "front_zh": "【待中文化】\nTo compute trapped rain water using two pointers, maintain left and right pointers with leftMax and rightMax. At each step, compare leftMax and rightMax. If leftMax < rightMax, the water trapped at the left side depends only on leftMax, so move left inward and add leftMax - height[left]. Otherwise, move right inward and add rightMax - height[right]. This works because the smaller boundary determines the maximum possible water level.",
+    "front_zh": "接雨水双指针法：维护 `leftMax` 与 `rightMax`。\n\n决策规则：\n- 若 `leftMax < rightMax`，左侧当前格子的水量由 `leftMax` 决定\n- 否则右侧由 `rightMax` 决定\n\n```python\ndef trap(height):\n    l, r = 0, len(height) - 1\n    leftMax = rightMax = 0\n    ans = 0\n\n    while l < r:\n        leftMax = max(leftMax, height[l])\n        rightMax = max(rightMax, height[r])\n\n        if leftMax < rightMax:\n            ans += leftMax - height[l]\n            l += 1\n        else:\n            ans += rightMax - height[r]\n            r -= 1\n\n    return ans\n```\n\n本质：哪边“更短的上界”先确定，就能先结算哪边。",
     "check_q_en": "Why can we safely compute trapped water on the side with the smaller max without knowing the exact heights on the other side?",
     "check_a_en": "If leftMax < rightMax, the water level at the left position is bounded by leftMax regardless of the right side details, because there exists a right boundary at least as high as rightMax (which is higher than leftMax). So the limiting factor for that left position is leftMax, and we can finalize its trapped water immediately (symmetrically for the right side)."
   },
@@ -288,7 +288,7 @@
     ],
     "cooldown_hours": 24,
     "is_active": true,
-    "front_zh": "【待中文化】\nSliding Window applies to problems about a contiguous subarray or substring where a window state can be maintained incrementally as the right pointer expands. The typical flow is: expand the right pointer to explore larger windows, and when the window becomes invalid, shrink the left pointer until validity is restored. Update the answer only when the window is valid. This approach relies on the window-validity condition being monotonic with respect to expansion.",
+    "front_zh": "滑动窗口通用适用条件：\n- 问题对象是连续子串/子数组\n- 窗口状态可增量维护\n- 合法性随扩张/收缩呈单调可恢复\n\n标准骨架：\n```text\nl = 0\nfor r in [0..n-1]:\n  add(arr[r])\n  while window_invalid():\n    remove(arr[l])\n    l += 1\n  update_answer(l, r)   # 仅在合法窗口更新\n```\n\n不适用例子：\n- “和恰好等于 K”且存在负数，合法性不具备单调恢复性，通常要用前缀和+哈希。",
     "check_q_en": "When should you NOT use the standard sliding-window pattern? Describe a case where window validity is not monotonic (for example, exact constraints) and explain why shrinking the left pointer cannot reliably restore validity.",
     "check_a_en": "Do not use it when validity is not monotonic under expansion (adding elements can flip validity in a non-one-way manner). For exact constraints like “window sum equals K” with arbitrary positive/negative numbers, adding a new element can make the sum overshoot or undershoot unpredictably, and shrinking from the left does not guarantee you can restore the exact condition in a monotonic way. In such cases you typically need prefix sums + hashmap or other techniques."
   },
@@ -306,7 +306,7 @@
     ],
     "cooldown_hours": 24,
     "is_active": true,
-    "front_zh": "滑动窗口题中常见错误包括：（1）在收缩窗口时使用 `if` 而不是 `while`，导致窗口可能仍然不合法；（2）在窗口恢复合法之前就更新答案，把非法窗口计入结果；（3）窗口状态（如 set / map）与左右指针不同步，例如移动了指针却忘记更新状态；（4）在没有明确不变量的情况下随意移动左指针。正确做法是：始终先恢复窗口合法性，再记录答案。",
+    "front_zh": "滑动窗口高频错误清单（面试易挂点）：\n\n1) 收缩用 `if` 而不是 `while`\n2) 窗口非法时就更新答案\n3) 指针和状态更新不同步（移动了 `l/r` 但忘记更新 map/set）\n\n正确流程：\n```text\n先 add 右端\n若非法 -> while 持续 remove 左端直到合法\n合法后再 update answer\n```\n\n一句话：**先修复窗口，再记答案**。",
     "check_q_en": "为什么在收缩窗口时使用 `if` 而不是 `while` 可能导致结果错误？",
     "check_a_en": "因为收缩一次后窗口可能仍然不满足约束（仍然非法）。如果只用 if，会留下非法窗口并继续更新答案或推进右指针，导致把非法窗口计入结果，或让状态与指针不同步，最终得到错误答案。"
   },
@@ -325,7 +325,7 @@
     ],
     "cooldown_hours": 24,
     "is_active": true,
-    "front_zh": "【待中文化】\nThis sliding window pattern allows limited noise in the window. Track character frequencies and the maximum frequency `max_freq` in the current window. The window is valid if the number of replacements needed, computed as window_size minus max_freq, is at most k. Expand the right pointer greedily, and shrink the left pointer only when the replacement count exceeds k. Importantly, `max_freq` can be maintained as a non-decreasing value without breaking correctness.",
+    "front_zh": "Character Replacement 的窗口判定：\n\n需要替换字符数：`window_size - max_freq`\n\n窗口合法条件：\n- `window_size - max_freq <= k`\n\n```python\ndef characterReplacement(s, k):\n    cnt = {}\n    l = 0\n    max_freq = 0\n    ans = 0\n\n    for r, ch in enumerate(s):\n        cnt[ch] = cnt.get(ch, 0) + 1\n        max_freq = max(max_freq, cnt[ch])\n\n        while (r - l + 1) - max_freq > k:\n            cnt[s[l]] -= 1\n            l += 1\n\n        ans = max(ans, r - l + 1)\n\n    return ans\n```\n\n为什么 `max_freq` 可“偏大不回退”：\n- 它是上界；即便陈旧也不会错过全局最优长度。",
     "check_q_en": "Why is it correct to keep `max_freq` as a non-decreasing value even when the left pointer moves?",
     "check_a_en": "`max_freq` is used as an upper bound for the best single-character frequency seen so far. When it becomes stale after moving `l`, it can only overestimate the true max frequency in the current window, making the window appear more valid than it is. This does not harm correctness for maximizing window length because we only shrink when the window is definitely invalid; an overestimate cannot cause us to miss a larger valid window, and the algorithm still finds the maximum length."
   },
@@ -343,7 +343,7 @@
     ],
     "cooldown_hours": 24,
     "is_active": true,
-    "front_zh": "标准滑动窗口（约束型）模板：\n\n伪代码：\n```text\nl = 0\nfor r in [0..n-1]:\n    add(s[r])                 # 右端元素进入窗口，更新计数/状态\n    while window_invalid():    # 若窗口不满足约束，持续收缩直到合法\n        remove(s[l])           # 左端元素移出窗口，更新计数/状态\n        l += 1\n    update_answer(l, r)        # 此时窗口一定合法，可以更新答案\n```\n\n中文解释：\n1) 先把 r 指向的新元素纳入窗口（add），因为约束条件通常依赖窗口内容（频次、distinct 数、最大值等）。\n2) 再用 while 收缩窗口直到满足约束：只收缩一次（if）可能仍不合法，会导致用非法窗口更新答案。\n3) 只有在窗口合法时才更新答案，这样逻辑稳定、易证明正确性。",
+    "front_zh": "约束型滑动窗口模板（建议背熟）：\n\n```text\nl = 0\nfor r in [0..n-1]:\n  add(s[r])\n  while window_invalid():\n    remove(s[l])\n    l += 1\n  update_answer(l, r)\n```\n\n三点强约束：\n- 必须先 `add` 再判合法\n- 非法收缩必须 `while`，不是 `if`\n- 只在合法状态更新答案\n\n这三条能直接规避 80% 的窗口题实现错误。",
     "check_q_en": "为什么必须先 add(s[r]) 再 while 收缩，并且收缩要用 while 而不是 if？",
     "check_a_en": "因为约束条件通常取决于包含 s[r] 之后的窗口状态，必须先 add 才能正确判断是否合法；而一次收缩（if）后窗口可能仍不满足约束，只有 while 持续收缩到合法，才能保证 update_answer 使用的是合法窗口，避免错误结果。"
   },
@@ -362,7 +362,7 @@
     ],
     "cooldown_hours": 24,
     "is_active": true,
-    "front_zh": "Hard 模板：Minimum Window Substring（最短覆盖型滑动窗口）\n\n目标：在 s 中找到最短子串，使其“覆盖”t 的全部字符（含重复）。\n关键变通：这类题不是“while invalid 收缩”，而是“while valid 收缩”，因为目标是最短。\n\n核心状态定义：\n- need[c]：t 中每个字符需要的次数\n- window[c]：当前窗口 [l..r] 中每个字符的次数\n- required：need 中不同字符的种类数（len(need)）\n- formed：当前窗口中，已经满足 need 的字符种类数\n  - 当某字符 c 满足 window[c] == need[c] 时，formed += 1\n  - 当收缩导致 window[c] < need[c] 时，formed -= 1\n\n窗口“有效/覆盖”判定：\n- window_valid ⇔ formed == required\n\n伪代码（必须背下来的骨架）：\n```text\nneed = count(t)\nwindow = empty count map\nrequired = len(need)\nformed = 0\n\nl = 0\nbestLen = +inf\nbestL = 0\n\nfor r in [0..len(s)-1]:\n    ch = s[r]\n    window[ch] += 1\n    if ch in need and window[ch] == need[ch]:\n        formed += 1\n\n    while formed == required:          # 窗口已覆盖 t，开始尽量缩短\n        if (r - l + 1) < bestLen:\n            bestLen = r - l + 1\n            bestL = l\n\n        leftCh = s[l]\n        window[leftCh] -= 1\n        if leftCh in need and window[leftCh] < need[leftCh]:\n            formed -= 1\n        l += 1\n\nreturn \"\" if bestLen == +inf else s[bestL : bestL + bestLen]\n```\n\n中文解释（为什么有效）：\n- r 的作用：不断扩张直到满足覆盖（formed==required）。\n- l 的作用：一旦覆盖，就尽量把窗口缩短到“刚好覆盖”为止；缩短过程中更新最优。\n- formed/required 的作用：把“是否覆盖 t”从 O(字符集) 的遍历变成 O(1) 的判断。\n\n复杂度：\n- 时间 O(|s| + |t|)：l 和 r 都只单调前进，每个字符最多进窗口/出窗口一次。\n- 空间 O(|字符集|) 或 O(|need|)。",
+    "front_zh": "最短覆盖子串（Minimum Window Substring）是“**while valid 收缩**”模型。\n\n状态定义：\n- `need[c]`：目标串 t 需要数量\n- `window[c]`：当前窗口数量\n- `required`：需要满足的字符种类数\n- `formed`：当前已满足种类数\n\n```python\nfrom collections import Counter, defaultdict\n\ndef minWindow(s, t):\n    need = Counter(t)\n    window = defaultdict(int)\n    required = len(need)\n    formed = 0\n\n    l = 0\n    best_len = float('inf')\n    best_l = 0\n\n    for r, ch in enumerate(s):\n        window[ch] += 1\n        if ch in need and window[ch] == need[ch]:\n            formed += 1\n\n        while formed == required:  # valid 时尽量缩短\n            if r - l + 1 < best_len:\n                best_len = r - l + 1\n                best_l = l\n\n            left = s[l]\n            window[left] -= 1\n            if left in need and window[left] < need[left]:\n                formed -= 1\n            l += 1\n\n    if best_len == float('inf'):\n        return \"\"\n    return s[best_l: best_l + best_len]\n```\n\n要点：这题目标是“最短”，所以是 valid 时收缩，而不是 invalid 时收缩。",
     "check_q_en": "问1：为什么这题的收缩循环是 while(window_valid) 而不是 while(window_invalid)？",
     "check_a_en": "答1：因为目标是最短。一旦窗口已经覆盖 t（valid），继续保留多余字符只会让答案更差，所以必须在 valid 时尽可能收缩，并在收缩过程中不断更新最短答案。 问2：formed 和 required 分别代表什么？为什么能用 formed==required 判断窗口覆盖 t？ 答2：required 是 t 中需要满足的“不同字符种类数”；formed 是当前窗口中已经满足数量要求的字符种类数（当 window[c] 达到 need[c] 记为满足，跌破则不满足）。当 formed==required，说明每一种需要的字符都已满足数量要求，因此窗口覆盖 t。 问3：为什么判断 formed 增减时用 window[c] == need[c]（以及收缩时 window[c] < need[c]）而不是每次重新扫描 need？ 答3：这是把覆盖判定从重复扫描转换为增量维护。只在某个字符的计数跨过“满足阈值”时更新 formed，使每次移动指针的更新都是 O(1)，整体保持 O(|s|)。"
   },
