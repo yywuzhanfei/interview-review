@@ -10,7 +10,10 @@ type Card = {
   topic: string;
   difficulty: number;
   front: string;
+  front_zh?: string;
   check: string;
+  check_q_en?: string;
+  check_a_en?: string;
   tags?: string[];
   cooldown_hours?: number;
   is_active?: boolean;
@@ -177,7 +180,16 @@ export default function Home() {
       if (cardType !== "all" && c.type !== cardType) return false;
       if (c.difficulty > maxDifficulty) return false;
       if (!q) return true;
-      const text = [c.id, c.topic, c.front, c.check, c.domain, c.type, ...(c.tags || [])]
+      const text = [
+        c.id,
+        c.topic,
+        c.front_zh || c.front,
+        c.check_q_en || c.check,
+        c.check_a_en || "",
+        c.domain,
+        c.type,
+        ...(c.tags || []),
+      ]
         .join(" ")
         .toLowerCase();
       return text.includes(q);
@@ -251,7 +263,7 @@ export default function Home() {
               <div className="rounded-xl border border-slate-800 bg-slate-900 p-4 space-y-3">
                 <p className="text-xs text-slate-400">{currentCard.id} · {currentCard.domain} · {currentCard.type} · 难度 {currentCard.difficulty}</p>
                 <h2 className="text-lg font-semibold break-words [overflow-wrap:anywhere]">{currentCard.topic}</h2>
-                <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-slate-200 leading-7">{currentCard.front}</p>
+                <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-slate-200 leading-7">{currentCard.front_zh || currentCard.front}</p>
 
                 {!showAnswer ? (
                   <button
@@ -262,9 +274,16 @@ export default function Home() {
                   </button>
                 ) : (
                   <>
-                    <div className="rounded-lg border border-slate-700 bg-slate-950/60 p-3">
-                      <p className="text-sm font-semibold text-emerald-300 mb-1">Check</p>
-                      <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-slate-200 leading-7">{currentCard.check}</p>
+                    <div className="rounded-lg border border-slate-700 bg-slate-950/60 p-3 space-y-2">
+                      <p className="text-sm font-semibold text-emerald-300 mb-1">English Q&A</p>
+                      <div>
+                        <p className="text-xs uppercase tracking-wide text-slate-400">Question</p>
+                        <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-slate-200 leading-7">{currentCard.check_q_en || currentCard.check}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs uppercase tracking-wide text-slate-400">Answer</p>
+                        <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-slate-200 leading-7">{currentCard.check_a_en || "(No answer yet)"}</p>
+                      </div>
                     </div>
                     <div className="grid grid-cols-3 gap-2">
                       <button onClick={() => gradeCard("again")} className="rounded-lg bg-rose-500/90 py-2 text-sm font-semibold">Again</button>
@@ -340,13 +359,20 @@ export default function Home() {
             </div>
 
             <article className="space-y-2 min-w-0">
-              <h3 className="font-semibold text-sky-300">Card</h3>
-              <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-slate-200 leading-7">{selected.front}</p>
+              <h3 className="font-semibold text-sky-300">Card (中文主体)</h3>
+              <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-slate-200 leading-7">{selected.front_zh || selected.front}</p>
             </article>
 
             <article className="space-y-2 min-w-0">
-              <h3 className="font-semibold text-emerald-300">Check</h3>
-              <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-slate-200 leading-7">{selected.check}</p>
+              <h3 className="font-semibold text-emerald-300">English Q&A</h3>
+              <div>
+                <p className="text-xs uppercase tracking-wide text-slate-400">Question</p>
+                <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-slate-200 leading-7">{selected.check_q_en || selected.check}</p>
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-wide text-slate-400">Answer</p>
+                <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-slate-200 leading-7">{selected.check_a_en || "(No answer yet)"}</p>
+              </div>
             </article>
           </div>
         </div>
