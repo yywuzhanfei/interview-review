@@ -1,4 +1,4 @@
-const CACHE_NAME = "algo-pocket-v1";
+const CACHE_NAME = "algo-pocket-v2";
 const URLS_TO_CACHE = ["/", "/manifest.webmanifest", "/icon.svg", "/favicon.ico"];
 
 self.addEventListener("install", (event) => {
@@ -7,7 +7,6 @@ self.addEventListener("install", (event) => {
       return cache.addAll(URLS_TO_CACHE);
     })
   );
-  self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
@@ -21,8 +20,29 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
+});
+
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
+
+  const isDocument = event.request.mode === "navigate";
+
+  if (isDocument) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
+          return response;
+        })
+        .catch(() => caches.match(event.request).then((cached) => cached || caches.match("/")))
+    );
+    return;
+  }
 
   event.respondWith(
     caches.match(event.request).then((cached) => {
