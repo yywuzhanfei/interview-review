@@ -87,7 +87,7 @@
     ],
     "cooldown_hours": 24,
     "is_active": true,
-    "front_zh": "初始化二维/嵌套容器时，`[[] for _ in range(n)]` 会创建 **n 个独立 list 对象**。\n\n```python\nbuckets = [[] for _ in range(3)]\nbuckets[0].append(1)\n# 结果: [[1], [], []]\n```\n\n不要写 `[[]] * n`：\n- 这会复制同一个引用\n- 改一个位置会“全体联动”\n\n```python\nbad = [[]] * 3\nbad[0].append(1)\n# 结果: [[1], [1], [1]]  (错误副作用)\n``",
+    "front_zh": "初始化二维/嵌套容器时，`[[] for _ in range(n)]` 会创建 **n 个独立 list 对象**。\n\n```python\nbuckets = [[] for _ in range(3)]\nbuckets[0].append(1)\n# 结果: [[1], [], []]\n```\n\n不要写 `[[]] * n`：\n- 这会复制同一个引用\n- 改一个位置会“全体联动”\n\n```python\nbad = [[]] * 3\nbad[0].append(1)\n# 结果: [[1], [1], [1]]  (错误副作用)\n```",
     "check_q_en": "Why is `[[] for i in range(3)]` different from `[[]] * 3`?",
     "check_a_en": "`[[] for _ in range(3)]` creates three distinct inner lists, so modifying one does not affect others. `[[]] * 3` repeats references to the same list object three times, so modifying one inner list appears in all positions."
   },
