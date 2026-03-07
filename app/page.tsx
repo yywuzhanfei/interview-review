@@ -107,6 +107,49 @@ function nextEntry(prev: ReviewEntry, grade: Grade): ReviewEntry {
   };
 }
 
+function RichText({ text }: { text: string }) {
+  const source = String(text || "");
+  const regex = /```([a-zA-Z0-9_-]+)?\n?([\s\S]*?)```/g;
+  const parts: Array<{ kind: "text" | "code"; value: string; lang?: string }> = [];
+
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = regex.exec(source)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push({ kind: "text", value: source.slice(lastIndex, match.index) });
+    }
+    parts.push({ kind: "code", lang: match[1] || "text", value: match[2] || "" });
+    lastIndex = regex.lastIndex;
+  }
+
+  if (lastIndex < source.length) {
+    parts.push({ kind: "text", value: source.slice(lastIndex) });
+  }
+
+  return (
+    <div className="space-y-3 min-w-0">
+      {parts.map((part, idx) =>
+        part.kind === "code" ? (
+          <div key={idx} className="rounded-lg border border-slate-700 bg-slate-950 overflow-x-auto">
+            <div className="px-3 pt-2 text-[10px] uppercase tracking-wide text-slate-500">{part.lang}</div>
+            <pre className="p-3 text-sm text-slate-100 leading-6 whitespace-pre">
+              <code>{part.value.trimEnd()}</code>
+            </pre>
+          </div>
+        ) : (
+          <p
+            key={idx}
+            className="whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-slate-200 leading-7"
+          >
+            {part.value}
+          </p>
+        )
+      )}
+    </div>
+  );
+}
+
 export default function Home() {
   const [tab, setTab] = useState<"review" | "library">("review");
   const [query, setQuery] = useState("");
@@ -263,7 +306,7 @@ export default function Home() {
               <div className="rounded-xl border border-slate-800 bg-slate-900 p-4 space-y-3">
                 <p className="text-xs text-slate-400">{currentCard.id} · {currentCard.domain} · {currentCard.type} · 难度 {currentCard.difficulty}</p>
                 <h2 className="text-lg font-semibold break-words [overflow-wrap:anywhere]">{currentCard.topic}</h2>
-                <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-slate-200 leading-7">{currentCard.front_zh || currentCard.front}</p>
+                <RichText text={currentCard.front_zh || currentCard.front} />
 
                 {!showAnswer ? (
                   <button
@@ -278,11 +321,11 @@ export default function Home() {
                       <p className="text-sm font-semibold text-emerald-300 mb-1">English Q&A</p>
                       <div>
                         <p className="text-xs uppercase tracking-wide text-slate-400">Question</p>
-                        <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-slate-200 leading-7">{currentCard.check_q_en || currentCard.check}</p>
+                        <RichText text={currentCard.check_q_en || currentCard.check} />
                       </div>
                       <div>
                         <p className="text-xs uppercase tracking-wide text-slate-400">Answer</p>
-                        <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-slate-200 leading-7">{currentCard.check_a_en || "(No answer yet)"}</p>
+                        <RichText text={currentCard.check_a_en || "(No answer yet)"} />
                       </div>
                     </div>
                     <div className="grid grid-cols-3 gap-2">
@@ -360,18 +403,18 @@ export default function Home() {
 
             <article className="space-y-2 min-w-0">
               <h3 className="font-semibold text-sky-300">Card (中文主体)</h3>
-              <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-slate-200 leading-7">{selected.front_zh || selected.front}</p>
+              <RichText text={selected.front_zh || selected.front} />
             </article>
 
             <article className="space-y-2 min-w-0">
               <h3 className="font-semibold text-emerald-300">English Q&A</h3>
               <div>
                 <p className="text-xs uppercase tracking-wide text-slate-400">Question</p>
-                <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-slate-200 leading-7">{selected.check_q_en || selected.check}</p>
+                <RichText text={selected.check_q_en || selected.check} />
               </div>
               <div>
                 <p className="text-xs uppercase tracking-wide text-slate-400">Answer</p>
-                <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-slate-200 leading-7">{selected.check_a_en || "(No answer yet)"}</p>
+                <RichText text={selected.check_a_en || "(No answer yet)"} />
               </div>
             </article>
           </div>
