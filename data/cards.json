@@ -13,7 +13,7 @@
     ],
     "cooldown_hours": 24,
     "is_active": true,
-    "front_zh": "【待中文化】\nTo encode a list of strings into a single string safely, prefix each string with its length and a delimiter (e.g., len#string). This avoids ambiguity even when strings contain any characters, including the delimiter itself. Decoding works by reading the length first, then slicing exactly that many characters.",
+    "front_zh": "当你需要把「字符串数组」安全地编码成一个字符串时，推荐用**长度前缀**方案，而不是纯分隔符拼接。\n\n核心格式：\n`len#content`\n\n例如：\n`[\"ab\", \"x#y\", \"\"]` 可以编码为：\n\n`2#ab3#x#y0#`\n\n优势：\n- 即使内容里本身包含 `#`，也不会歧义\n- 解码时先读长度，再按长度切片，边界明确\n\n```text\n编码伪代码：\nfor s in strs:\n  out += str(len(s)) + \"#\" + s\n\n解码伪代码：\ni = 0\nwhile i < len(data):\n  j = i\n  while data[j] != '#':\n    j += 1\n  L = int(data[i:j])\n  s = data[j+1 : j+1+L]\n  ans.append(s)\n  i = j + 1 + L\n```",
     "check_q_en": "Why is length-prefix encoding safer than using only a delimiter between strings?",
     "check_a_en": "Because a delimiter-only scheme becomes ambiguous when the delimiter appears inside the strings. Length-prefix encoding reads an explicit length first, so the decoder knows exactly how many characters to consume for each string regardless of contents, eliminating ambiguity."
   },
@@ -31,7 +31,7 @@
     ],
     "cooldown_hours": 24,
     "is_active": true,
-    "front_zh": "【待中文化】\nIn Python, int(s[i:j]) converts a substring slice directly into an integer. This works because string slicing returns a new string, and int() parses it until the full slice is consumed. It is commonly used when parsing protocols or encoded data where numeric fields are embedded in strings.",
+    "front_zh": "在 Python 里，`int(s[i:j])` 会把切片后的字符串直接解析为整数。\n\n成立前提：\n- `s[i:j]` 不能为空\n- 内容必须是合法整数字符串（可带前导符号）\n- 不能混入非数字字符（比如字母、`#`）\n\n典型用途：\n- 解析协议字段（长度、编号）\n- 处理编码串里的数字片段\n\n```python\ns = \"12345\"\nint(s[1:4])   # 234\n\nx = \"-42\"\nint(x)        # -42\n\n# 非法示例：\n# int(\"12#\") -> ValueError\n# int(\"\")    -> ValueError\n```",
     "check_q_en": "What assumptions must hold for int(s[i:j]) to succeed without raising an exception?",
     "check_a_en": "The slice s[i:j] must be a valid integer representation (typically digits, optionally with a leading sign), not empty, and not containing non-numeric characters (like letters or '#'). Otherwise int() raises ValueError."
   },
@@ -50,7 +50,7 @@
     ],
     "cooldown_hours": 24,
     "is_active": true,
-    "front_zh": "【待中文化】\nExample of slicing with indices i and j:\n\ns = \"12345\"\ni = 1, j = 4\ns[i:j] == \"234\"\nint(s[i:j]) == 234\n\nThis works because slicing includes index i and excludes index j, so the characters at positions 1, 2, and 3 are selected.",
+    "front_zh": "Python 切片规则是 **左闭右开**：`s[i:j]` 包含 `i`，不包含 `j`。\n\n示例：\n```python\ns = \"12345\"\ni, j = 1, 4\ns[i:j]        # \"234\"\nint(s[i:j])   # 234\n```\n\n你可以把它理解成：\n- 取下标 `1,2,3` 三个位置\n- 所以结果是 `\"234\"`\n\n再看一个：\n```python\ns[0:2]        # \"12\"\nint(s[0:2])   # 12\n```",
     "check_q_en": "If i = 0 and j = 2, what are s[i:j] and int(s[i:j])?",
     "check_a_en": "s[i:j] = s[0:2] = \"12\" (includes index 0, excludes index 2). int(s[i:j]) = int(\"12\") = 12."
   },
@@ -69,7 +69,7 @@
     ],
     "cooldown_hours": 24,
     "is_active": true,
-    "front_zh": "【待中文化】\nWhen frequencies are bounded by n, you can find Top K frequent elements using frequency buckets instead of a heap. First count occurrences with a hashmap. Then create an array of buckets where index i stores all numbers that appear exactly i times. Finally, iterate the buckets from high to low frequency and collect elements until k is reached. This achieves O(n) time.",
+    "front_zh": "这题的关键是：当频次上界是 `n` 时，Top K 频率可以用**桶**做成线性时间。\n\n步骤：\n1. 用哈希表统计每个数出现次数\n2. 建立 `buckets`，下标 `i` 存放“出现 `i` 次”的元素\n3. 从高频桶往低频桶扫，拿满 `k` 个为止\n\n```python\nfrom collections import Counter\n\ndef topKFrequent(nums, k):\n    cnt = Counter(nums)\n    buckets = [[] for _ in range(len(nums) + 1)]\n\n    for x, f in cnt.items():\n        buckets[f].append(x)\n\n    ans = []\n    for f in range(len(nums), 0, -1):\n        for x in buckets[f]:\n            ans.append(x)\n            if len(ans) == k:\n                return ans\n```\n\n为什么桶大小是 `n+1`：\n- 某个元素最多出现 `n` 次\n- 需要能访问 `buckets[n]`",
     "check_q_en": "Why does the bucket array need a size of len(nums) + 1?",
     "check_a_en": "Because an element can appear at most n = len(nums) times, so we need indices 0..n. Index i represents frequency i; without size n+1, frequency n would be out of bounds."
   },
@@ -87,7 +87,7 @@
     ],
     "cooldown_hours": 24,
     "is_active": true,
-    "front_zh": "【待中文化】\nIn Python, `[[] for i in range(n)]` creates a list containing n independent empty lists. Each inner list is a distinct object. This pattern is commonly used to initialize buckets, adjacency lists, or grouped containers where elements will be appended later.",
+    "front_zh": "初始化二维/嵌套容器时，`[[] for _ in range(n)]` 会创建 **n 个独立 list 对象**。\n\n```python\nbuckets = [[] for _ in range(3)]\nbuckets[0].append(1)\n# 结果: [[1], [], []]\n```\n\n不要写 `[[]] * n`：\n- 这会复制同一个引用\n- 改一个位置会“全体联动”\n\n```python\nbad = [[]] * 3\nbad[0].append(1)\n# 结果: [[1], [1], [1]]  (错误副作用)\n``",
     "check_q_en": "Why is `[[] for i in range(3)]` different from `[[]] * 3`?",
     "check_a_en": "`[[] for _ in range(3)]` creates three distinct inner lists, so modifying one does not affect others. `[[]] * 3` repeats references to the same list object three times, so modifying one inner list appears in all positions."
   },
@@ -105,7 +105,7 @@
     ],
     "cooldown_hours": 24,
     "is_active": true,
-    "front_zh": "To group anagrams efficiently, map each string to a canonical(规范的) representation that uniquely identifies its character composition. A common approach is to use a fixed-length frequency array (e.g., counts of 'a' to 'z') and convert it to a tuple to serve as a hashable key. Strings with identical frequency vectors are anagrams and belong to the same group.",
+    "front_zh": "分组异位词（anagram）时，核心是给每个字符串构造一个**唯一规范表示**。\n\n常用做法：\n- 用长度 26 的频次数组统计 `a~z`\n- 转成 tuple 作为哈希 key\n- key 相同 => 属于同一组\n\n```python\nfrom collections import defaultdict\n\ndef groupAnagrams(strs):\n    mp = defaultdict(list)\n    for s in strs:\n        cnt = [0] * 26\n        for ch in s:\n            cnt[ord(ch) - ord('a')] += 1\n        mp[tuple(cnt)].append(s)   # list 不能做 key，tuple 可以\n    return list(mp.values())\n```\n\n注意：\n- list 可变、不可哈希\n- tuple 不可变、可哈希（元素可哈希时）",
     "check_q_en": "Why must the frequency array be converted to a tuple before being used as a dictionary key?",
     "check_a_en": "Because lists are mutable and unhashable in Python, so they cannot be dictionary keys. Tuples are immutable and hashable (given hashable contents), making them valid keys."
   },
@@ -123,7 +123,7 @@
     ],
     "cooldown_hours": 24,
     "is_active": true,
-    "front_zh": "【待中文化】\nIn Python, `ord(c)` returns the Unicode code point of character `c`. Subtracting `ord('a')` maps lowercase letters 'a' to 'z' into indices 0 to 25. This is commonly used to convert characters into array indices for fixed-size frequency counting.",
+    "front_zh": "`ord(c)` 返回字符的 Unicode 码点。\n\n在只含小写字母时，常用映射：\n`idx = ord(c) - ord('a')`\n\n这样：\n- `'a' -> 0`\n- `'b' -> 1`\n- `'c' -> 2`\n- ...\n- `'z' -> 25`\n\n```python\nidx = ord('c') - ord('a')  # 2\nfreq = [0] * 26\nfreq[idx] += 1\n```\n\n这是做字符频次统计、字母桶计数的标准写法。",
     "check_q_en": "If c = 'c', what is ord(c) - ord('a'), and why does this mapping start at 0?",
     "check_a_en": "ord('c') - ord('a') = 2, so 'c' maps to index 2. It starts at 0 because arrays are 0-indexed and we want 'a' to map to the first slot."
   },
@@ -141,7 +141,7 @@
     ],
     "cooldown_hours": 24,
     "is_active": true,
-    "front_zh": "【待中文化】\n`defaultdict(list)` automatically creates a new empty list when accessing a missing key. This allows values to be appended without checking key existence, making it ideal for grouping and bucketing patterns.",
+    "front_zh": "`defaultdict(list)` 的意义是：访问不存在的 key 时，自动创建一个空 list。\n\n所以你可以直接 append，而不用手动写 key 是否存在判断。\n\n```python\nfrom collections import defaultdict\n\nmp = defaultdict(list)\nmp['a'].append(1)   # 第一次访问 'a'，自动变成 [] 再 append\nmp['a'].append(2)\n# mp['a'] == [1, 2]\n```\n\n典型场景：\n- 分组（group by）\n- 桶分配（bucket）\n- 邻接表构建（graph adjacency list）",
     "check_q_en": "What happens the first time you access a key that does not exist in a defaultdict(list)?",
     "check_a_en": "The key is created automatically and its value is initialized to an empty list `[]`, so you can append to it immediately."
   },
@@ -160,7 +160,7 @@
     ],
     "cooldown_hours": 24,
     "is_active": true,
-    "front_zh": "【待中文化】\nTo compute the product of all elements except self without division, split the product into two independent parts: prefix and postfix. For each index i, the result is the product of all elements to the left (prefix) and all elements to the right (postfix). Build prefix products in a forward pass and postfix products in a backward pass, combining them in O(n) time and O(1) extra space (excluding output).",
+    "front_zh": "“除自身以外数组乘积”不使用除法时，用前缀积 + 后缀积。\n\n思路：\n- `res[i]` 先存左侧乘积（prefix）\n- 再从右往左乘上右侧乘积（postfix）\n\n```python\ndef productExceptSelf(nums):\n    n = len(nums)\n    res = [1] * n\n\n    prefix = 1\n    for i in range(n):\n        res[i] = prefix\n        prefix *= nums[i]\n\n    postfix = 1\n    for i in range(n - 1, -1, -1):\n        res[i] *= postfix\n        postfix *= nums[i]\n\n    return res\n```\n\n优点：\n- 时间 `O(n)`\n- 额外空间 `O(1)`（不算输出数组）\n- 遇到 0 也能自然处理，不需要特判除法",
     "check_q_en": "Why does this approach correctly handle arrays containing zero?",
     "check_a_en": "Because it never divides by an element. The result at each index is computed from products excluding that index; zeros naturally propagate through prefix/postfix products, yielding correct zeros where appropriate without special-case division logic."
   },
@@ -179,7 +179,7 @@
     ],
     "cooldown_hours": 24,
     "is_active": true,
-    "front_zh": "【待中文化】\nTo validate a Sudoku board, maintain three independent constraint sets: one for each row, one for each column, and one for each 3x3 sub-box. The key insight for sub-box validation is to map each cell (r, c) to a unique box index using integer division: (r // 3, c // 3). Cells that share the same (r // 3, c // 3) pair belong to the same 3x3 box. While scanning the board, check whether the current value already exists in its row set, column set, or box set. If any constraint is violated, the board is invalid.",
+    "front_zh": "验证数独时，用三类约束集合：\n- 行约束（row）\n- 列约束（col）\n- 3x3 宫约束（box）\n\n每个非空数字 `v` 在同一行/列/宫里只能出现一次。\n\n关键点：宫坐标用 `(r // 3, c // 3)` 标识。\n\n```python\ndef isValidSudoku(board):\n    rows = [set() for _ in range(9)]\n    cols = [set() for _ in range(9)]\n    boxes = {}  # key: (r//3, c//3)\n\n    for r in range(9):\n        for c in range(9):\n            v = board[r][c]\n            if v == '.':\n                continue\n\n            b = (r // 3, c // 3)\n            if b not in boxes:\n                boxes[b] = set()\n\n            if v in rows[r] or v in cols[c] or v in boxes[b]:\n                return False\n\n            rows[r].add(v)\n            cols[c].add(v)\n            boxes[b].add(v)\n\n    return True\n```\n\n`(r // 3, c // 3)` 的作用：\n- 把 9x9 网格稳定映射到 9 个 3x3 小宫。",
     "check_q_en": "Why does using (r // 3, c // 3) correctly group all cells belonging to the same 3x3 sub-box?",
     "check_a_en": "Integer division by 3 maps rows 0–2 to 0, 3–5 to 1, 6–8 to 2 (same for columns). Thus all cells in the same 3x3 region share the same (r//3, c//3) pair, and cells from different boxes have different pairs."
   },
