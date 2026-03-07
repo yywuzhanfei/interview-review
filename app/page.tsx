@@ -308,6 +308,20 @@ export default function Home() {
                 <h2 className="text-lg font-semibold break-words [overflow-wrap:anywhere]">{currentCard.topic}</h2>
                 <RichText text={currentCard.front_zh || currentCard.front} />
 
+                <div className="rounded-lg border border-slate-700 bg-slate-950/60 p-3 space-y-2">
+                  <p className="text-sm font-semibold text-emerald-300 mb-1">English Q&A</p>
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-slate-400">Question</p>
+                    <RichText text={currentCard.check_q_en || currentCard.check} />
+                  </div>
+                  {showAnswer ? (
+                    <div>
+                      <p className="text-xs uppercase tracking-wide text-slate-400">Answer</p>
+                      <RichText text={currentCard.check_a_en || "(No answer yet)"} />
+                    </div>
+                  ) : null}
+                </div>
+
                 {!showAnswer ? (
                   <button
                     onClick={() => setShowAnswer(true)}
@@ -316,24 +330,11 @@ export default function Home() {
                     显示答案
                   </button>
                 ) : (
-                  <>
-                    <div className="rounded-lg border border-slate-700 bg-slate-950/60 p-3 space-y-2">
-                      <p className="text-sm font-semibold text-emerald-300 mb-1">English Q&A</p>
-                      <div>
-                        <p className="text-xs uppercase tracking-wide text-slate-400">Question</p>
-                        <RichText text={currentCard.check_q_en || currentCard.check} />
-                      </div>
-                      <div>
-                        <p className="text-xs uppercase tracking-wide text-slate-400">Answer</p>
-                        <RichText text={currentCard.check_a_en || "(No answer yet)"} />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-3 gap-2">
-                      <button onClick={() => gradeCard("again")} className="rounded-lg bg-rose-500/90 py-2 text-sm font-semibold">Again</button>
-                      <button onClick={() => gradeCard("hard")} className="rounded-lg bg-amber-500/90 py-2 text-sm font-semibold">Hard</button>
-                      <button onClick={() => gradeCard("good")} className="rounded-lg bg-emerald-500/90 py-2 text-sm font-semibold text-slate-950">Good</button>
-                    </div>
-                  </>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button onClick={() => gradeCard("again")} className="rounded-lg bg-rose-500/90 py-2 text-sm font-semibold">Again</button>
+                    <button onClick={() => gradeCard("hard")} className="rounded-lg bg-amber-500/90 py-2 text-sm font-semibold">Hard</button>
+                    <button onClick={() => gradeCard("good")} className="rounded-lg bg-emerald-500/90 py-2 text-sm font-semibold text-slate-950">Good</button>
+                  </div>
                 )}
               </div>
             )}
