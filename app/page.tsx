@@ -98,15 +98,15 @@ export default function Home() {
             ))}
           </select>
 
-          <div className="md:col-span-2 flex items-center gap-3 text-sm">
-            <label className="text-slate-300">难度 ≤ {maxDifficulty}</label>
+          <div className="md:col-span-2 min-w-0 flex flex-col md:flex-row md:items-center gap-2 md:gap-3 text-sm">
+            <label className="text-slate-300 shrink-0">难度 ≤ {maxDifficulty}</label>
             <input
               type="range"
               min={1}
               max={5}
               value={maxDifficulty}
               onChange={(e) => setMaxDifficulty(Number(e.target.value))}
-              className="w-full"
+              className="w-full md:flex-1 min-w-0"
             />
           </div>
 
