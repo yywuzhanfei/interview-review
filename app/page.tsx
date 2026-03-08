@@ -9,9 +9,9 @@ type Card = {
   type: string;
   topic: string;
   difficulty: number;
-  front: string;
+  front?: string;
   front_zh?: string;
-  check: string;
+  check?: string;
   check_q_en?: string;
   check_a_en?: string;
   tags?: string[];
@@ -107,7 +107,7 @@ function nextEntry(prev: ReviewEntry, grade: Grade): ReviewEntry {
   };
 }
 
-function RichText({ text }: { text: string }) {
+function RichText({ text }: { text?: string }) {
   const source = String(text || "");
   const regex = /```([a-zA-Z0-9_-]+)?\n?([\s\S]*?)```/g;
   const parts: Array<{ kind: "text" | "code"; value: string; lang?: string }> = [];

@@ -5,8 +5,6 @@
     "type": "pattern",
     "topic": "string_encoding",
     "difficulty": 3,
-    "front": "To encode a list of strings into a single string safely, prefix each string with its length and a delimiter (e.g., len#string). This avoids ambiguity even when strings contain any characters, including the delimiter itself. Decoding works by reading the length first, then slicing exactly that many characters.",
-    "check": "问：Why is length-prefix encoding safer than using only a delimiter between strings?\n答：Because a delimiter-only scheme becomes ambiguous when the delimiter appears inside the strings. Length-prefix encoding reads an explicit length first, so the decoder knows exactly how many characters to consume for each string regardless of contents, eliminating ambiguity.",
     "tags": [
       "string",
       "serialization"
@@ -23,8 +21,6 @@
     "type": "micro",
     "topic": "python",
     "difficulty": 2,
-    "front": "In Python, int(s[i:j]) converts a substring slice directly into an integer. This works because string slicing returns a new string, and int() parses it until the full slice is consumed. It is commonly used when parsing protocols or encoded data where numeric fields are embedded in strings.",
-    "check": "问：What assumptions must hold for int(s[i:j]) to succeed without raising an exception?\n答：The slice s[i:j] must be a valid integer representation (typically digits, optionally with a leading sign), not empty, and not containing non-numeric characters (like letters or '#'). Otherwise int() raises ValueError.",
     "tags": [
       "python",
       "string"
@@ -41,8 +37,6 @@
     "type": "micro",
     "topic": "python_string_slicing",
     "difficulty": 1,
-    "front": "Example of slicing with indices i and j:\n\ns = \"12345\"\ni = 1, j = 4\ns[i:j] == \"234\"\nint(s[i:j]) == 234\n\nThis works because slicing includes index i and excludes index j, so the characters at positions 1, 2, and 3 are selected.",
-    "check": "问：If i = 0 and j = 2, what are s[i:j] and int(s[i:j])?\n答：s[i:j] = s[0:2] = \"12\" (includes index 0, excludes index 2). int(s[i:j]) = int(\"12\") = 12.",
     "tags": [
       "python",
       "string",
@@ -60,8 +54,6 @@
     "type": "pattern",
     "topic": "bucket_sort_frequency",
     "difficulty": 3,
-    "front": "When frequencies are bounded by n, you can find Top K frequent elements using frequency buckets instead of a heap. First count occurrences with a hashmap. Then create an array of buckets where index i stores all numbers that appear exactly i times. Finally, iterate the buckets from high to low frequency and collect elements until k is reached. This achieves O(n) time.",
-    "check": "问：Why does the bucket array need a size of len(nums) + 1?\n答：Because an element can appear at most n = len(nums) times, so we need indices 0..n. Index i represents frequency i; without size n+1, frequency n would be out of bounds.",
     "tags": [
       "hashmap",
       "bucket_sort",
@@ -79,8 +71,6 @@
     "type": "micro",
     "topic": "python",
     "difficulty": 2,
-    "front": "In Python, `[[] for i in range(n)]` creates a list containing n independent empty lists. Each inner list is a distinct object. This pattern is commonly used to initialize buckets, adjacency lists, or grouped containers where elements will be appended later.",
-    "check": "问：Why is `[[] for i in range(3)]` different from `[[]] * 3`?\n答：`[[] for _ in range(3)]` creates three distinct inner lists, so modifying one does not affect others. `[[]] * 3` repeats references to the same list object three times, so modifying one inner list appears in all positions.",
     "tags": [
       "python",
       "list"
@@ -97,8 +87,6 @@
     "type": "pattern",
     "topic": "anagram_grouping",
     "difficulty": 3,
-    "front": "To group anagrams efficiently, map each string to a canonical(规范的) representation that uniquely identifies its character composition. A common approach is to use a fixed-length frequency array (e.g., counts of 'a' to 'z') and convert it to a tuple to serve as a hashable key. Strings with identical frequency vectors are anagrams and belong to the same group.",
-    "check": "问：Why must the frequency array be converted to a tuple before being used as a dictionary key?\n答：Because lists are mutable and unhashable in Python, so they cannot be dictionary keys. Tuples are immutable and hashable (given hashable contents), making them valid keys.",
     "tags": [
       "hashmap",
       "string"
@@ -115,8 +103,6 @@
     "type": "micro",
     "topic": "python",
     "difficulty": 2,
-    "front": "In Python, `ord(c)` returns the Unicode code point of character `c`. Subtracting `ord('a')` maps lowercase letters 'a' to 'z' into indices 0 to 25. This is commonly used to convert characters into array indices for fixed-size frequency counting.",
-    "check": "问：If c = 'c', what is ord(c) - ord('a'), and why does this mapping start at 0?\n答：ord('c') - ord('a') = 2, so 'c' maps to index 2. It starts at 0 because arrays are 0-indexed and we want 'a' to map to the first slot.",
     "tags": [
       "python",
       "string"
@@ -133,8 +119,6 @@
     "type": "micro",
     "topic": "python_defaultdict",
     "difficulty": 2,
-    "front": "`defaultdict(list)` automatically creates a new empty list when accessing a missing key. This allows values to be appended without checking key existence, making it ideal for grouping and bucketing patterns.",
-    "check": "问：What happens the first time you access a key that does not exist in a defaultdict(list)?\n答：The key is created automatically and its value is initialized to an empty list `[]`, so you can append to it immediately.",
     "tags": [
       "python",
       "hashmap"
@@ -151,8 +135,6 @@
     "type": "pattern",
     "topic": "prefix_postfix_product",
     "difficulty": 3,
-    "front": "To compute the product of all elements except self without division, split the product into two independent parts: prefix and postfix. For each index i, the result is the product of all elements to the left (prefix) and all elements to the right (postfix). Build prefix products in a forward pass and postfix products in a backward pass, combining them in O(n) time and O(1) extra space (excluding output).",
-    "check": "问：Why does this approach correctly handle arrays containing zero?\n答：Because it never divides by an element. The result at each index is computed from products excluding that index; zeros naturally propagate through prefix/postfix products, yielding correct zeros where appropriate without special-case division logic.",
     "tags": [
       "array",
       "prefix",
@@ -170,8 +152,6 @@
     "type": "pattern",
     "topic": "constraint_validation_sets",
     "difficulty": 3,
-    "front": "To validate a Sudoku board, maintain three independent constraint sets: one for each row, one for each column, and one for each 3x3 sub-box. The key insight for sub-box validation is to map each cell (r, c) to a unique box index using integer division: (r // 3, c // 3). Cells that share the same (r // 3, c // 3) pair belong to the same 3x3 box. While scanning the board, check whether the current value already exists in its row set, column set, or box set. If any constraint is violated, the board is invalid.",
-    "check": "问：Why does using (r // 3, c // 3) correctly group all cells belonging to the same 3x3 sub-box?\n答：Integer division by 3 maps rows 0–2 to 0, 3–5 to 1, 6–8 to 2 (same for columns). Thus all cells in the same 3x3 region share the same (r//3, c//3) pair, and cells from different boxes have different pairs.",
     "tags": [
       "hashset",
       "matrix",
@@ -189,8 +169,6 @@
     "type": "pattern",
     "topic": "hashset_consecutive_sequence",
     "difficulty": 3,
-    "front": "To find the longest consecutive sequence in an unsorted array in O(n), put all numbers into a hash set for O(1) membership checks. Only start counting from numbers that are sequence starts: a number x is a start if x-1 is not in the set. From each start, extend forward (x+1, x+2, ...) until the sequence breaks, and track the maximum length. This avoids repeated work because non-start numbers belong to a sequence that will be counted from its smallest element.",
-    "check": "问：Why do we only start expanding from x when (x - 1) is not in the set, and how does this prevent O(n^2) behavior?\n答：If x-1 exists, x is not the start of its sequence, so that sequence will be counted when we start from its smallest element. By expanding only from starts, each number is visited at most once by the expansion loop overall, avoiding repeated scans that cause O(n^2).",
     "tags": [
       "hashset",
       "array"
@@ -207,8 +185,6 @@
     "type": "micro",
     "topic": "string_normalization",
     "difficulty": 2,
-    "front": "When comparing characters under relaxed rules, first filter to alphanumeric characters, then normalize case. Alphanumeric filtering ensures punctuation does not affect logic, while lowercasing ensures case-insensitive comparison. In Python, this is often implemented using explicit ASCII checks or built-in helpers before comparison.",
-    "check": "问：Why must character filtering (alphanumeric) be done before lowercasing and comparison?\n答：Because punctuation/spaces should be ignored entirely; you need to skip them before comparing. After filtering to valid characters, normalizing case (e.g., lowercasing) ensures 'A' and 'a' are treated as equal under case-insensitive rules.",
     "tags": [
       "python",
       "string"
@@ -225,8 +201,6 @@
     "type": "pattern",
     "topic": "two_pointers_3sum_dedup",
     "difficulty": 4,
-    "front": "For 3Sum, sort the array, then fix an index i and solve a 2Sum (two pointers) on the subarray (i+1..end). The key is deduplication: (1) skip duplicate values for the fixed i to avoid generating identical triplets across iterations, and (2) after finding a valid pair, move pointers and skip duplicates (commonly skip duplicates on left after left++). These rules ensure uniqueness without missing valid combinations.",
-    "check": "问：Why must we dedupe at both levels (skip duplicate i, and skip duplicate left/right after a match) to avoid repeated triplets?\n答：Duplicate i values would anchor the same first element and reproduce the same pairs, creating identical triplets across iterations. Even with unique i, duplicate values at left/right after a match would generate the same second/third elements again. Deduping both levels ensures each unique triplet is emitted once.",
     "tags": [
       "two_pointers",
       "sorting"
@@ -243,8 +217,6 @@
     "type": "pattern",
     "topic": "two_pointers_move_shorter",
     "difficulty": 3,
-    "front": "For the max water container problem, use two pointers at the ends. The area is limited by the shorter height: area = min(h[l], h[r]) * (r - l). To possibly increase area while width shrinks, you must move the pointer at the shorter height. Moving the taller side cannot increase the limiting height and only decreases width, so it cannot lead to a better result.",
-    "check": "问：Why is it always safe to move the pointer on the shorter side, and why can moving the taller side never help at that moment?\n答：The current area is capped by the shorter height. Moving the taller side cannot increase the limiting (shorter) height, but it does reduce width, so the area cannot improve. Moving the shorter side is the only move that might increase the limiting height enough to offset the reduced width.",
     "tags": [
       "two_pointers",
       "greedy"
@@ -261,8 +233,6 @@
     "type": "pattern",
     "topic": "two_pointers_trapping_rain_water",
     "difficulty": 4,
-    "front": "To compute trapped rain water using two pointers, maintain left and right pointers with leftMax and rightMax. At each step, compare leftMax and rightMax. If leftMax < rightMax, the water trapped at the left side depends only on leftMax, so move left inward and add leftMax - height[left]. Otherwise, move right inward and add rightMax - height[right]. This works because the smaller boundary determines the maximum possible water level.",
-    "check": "问：Why can we safely compute trapped water on the side with the smaller max without knowing the exact heights on the other side?\n答：If leftMax < rightMax, the water level at the left position is bounded by leftMax regardless of the right side details, because there exists a right boundary at least as high as rightMax (which is higher than leftMax). So the limiting factor for that left position is leftMax, and we can finalize its trapped water immediately (symmetrically for the right side).",
     "tags": [
       "two_pointers",
       "array"
@@ -279,8 +249,6 @@
     "type": "pattern",
     "topic": "sliding_window_framework",
     "difficulty": 3,
-    "front": "Sliding Window applies to problems about a contiguous subarray or substring where a window state can be maintained incrementally as the right pointer expands. The typical flow is: expand the right pointer to explore larger windows, and when the window becomes invalid, shrink the left pointer until validity is restored. Update the answer only when the window is valid. This approach relies on the window-validity condition being monotonic with respect to expansion.",
-    "check": "问：When should you NOT use the standard sliding-window pattern? Describe a case where window validity is not monotonic (for example, exact constraints) and explain why shrinking the left pointer cannot reliably restore validity.\n答：Do not use it when validity is not monotonic under expansion (adding elements can flip validity in a non-one-way manner). For exact constraints like “window sum equals K” with arbitrary positive/negative numbers, adding a new element can make the sum overshoot or undershoot unpredictably, and shrinking from the left does not guarantee you can restore the exact condition in a monotonic way. In such cases you typically need prefix sums + hashmap or other techniques.",
     "tags": [
       "two_pointers",
       "array",
@@ -298,8 +266,6 @@
     "type": "micro",
     "topic": "sliding_window_common_mistakes",
     "difficulty": 2,
-    "front": "滑动窗口题中常见错误包括：（1）在收缩窗口时使用 `if` 而不是 `while`，导致窗口可能仍然不合法；（2）在窗口恢复合法之前就更新答案，把非法窗口计入结果；（3）窗口状态（如 set / map）与左右指针不同步，例如移动了指针却忘记更新状态；（4）在没有明确不变量的情况下随意移动左指针。正确做法是：始终先恢复窗口合法性，再记录答案。",
-    "check": "问：为什么在收缩窗口时使用 `if` 而不是 `while` 可能导致结果错误？\n答：因为收缩一次后窗口可能仍然不满足约束（仍然非法）。如果只用 if，会留下非法窗口并继续更新答案或推进右指针，导致把非法窗口计入结果，或让状态与指针不同步，最终得到错误答案。",
     "tags": [
       "sliding_window",
       "two_pointers"
@@ -316,8 +282,6 @@
     "type": "pattern",
     "topic": "sliding_window_character_replacement",
     "difficulty": 4,
-    "front": "This sliding window pattern allows limited noise in the window. Track character frequencies and the maximum frequency `max_freq` in the current window. The window is valid if the number of replacements needed, computed as window_size minus max_freq, is at most k. Expand the right pointer greedily, and shrink the left pointer only when the replacement count exceeds k. Importantly, `max_freq` can be maintained as a non-decreasing value without breaking correctness.",
-    "check": "问：Why is it correct to keep `max_freq` as a non-decreasing value even when the left pointer moves?\n答：`max_freq` is used as an upper bound for the best single-character frequency seen so far. When it becomes stale after moving `l`, it can only overestimate the true max frequency in the current window, making the window appear more valid than it is. This does not harm correctness for maximizing window length because we only shrink when the window is definitely invalid; an overestimate cannot cause us to miss a larger valid window, and the algorithm still finds the maximum length.",
     "tags": [
       "sliding_window",
       "hashmap",
@@ -335,8 +299,6 @@
     "type": "pattern",
     "topic": "sliding_window_template",
     "difficulty": 3,
-    "front": "标准滑动窗口（约束型）模板：\n\n伪代码：\n```text\nl = 0\nfor r in [0..n-1]:\n    add(s[r])                 # 右端元素进入窗口，更新计数/状态\n    while window_invalid():    # 若窗口不满足约束，持续收缩直到合法\n        remove(s[l])           # 左端元素移出窗口，更新计数/状态\n        l += 1\n    update_answer(l, r)        # 此时窗口一定合法，可以更新答案\n```\n\n中文解释：\n1) 先把 r 指向的新元素纳入窗口（add），因为约束条件通常依赖窗口内容（频次、distinct 数、最大值等）。\n2) 再用 while 收缩窗口直到满足约束：只收缩一次（if）可能仍不合法，会导致用非法窗口更新答案。\n3) 只有在窗口合法时才更新答案，这样逻辑稳定、易证明正确性。",
-    "check": "问：为什么必须先 add(s[r]) 再 while 收缩，并且收缩要用 while 而不是 if？\n答：因为约束条件通常取决于包含 s[r] 之后的窗口状态，必须先 add 才能正确判断是否合法；而一次收缩（if）后窗口可能仍不满足约束，只有 while 持续收缩到合法，才能保证 update_answer 使用的是合法窗口，避免错误结果。",
     "tags": [
       "sliding_window",
       "two_pointers"
@@ -353,8 +315,6 @@
     "type": "pattern",
     "topic": "sliding_window_min_cover",
     "difficulty": 5,
-    "front": "Hard 模板：Minimum Window Substring（最短覆盖型滑动窗口）\n\n目标：在 s 中找到最短子串，使其“覆盖”t 的全部字符（含重复）。\n关键变通：这类题不是“while invalid 收缩”，而是“while valid 收缩”，因为目标是最短。\n\n核心状态定义：\n- need[c]：t 中每个字符需要的次数\n- window[c]：当前窗口 [l..r] 中每个字符的次数\n- required：need 中不同字符的种类数（len(need)）\n- formed：当前窗口中，已经满足 need 的字符种类数\n  - 当某字符 c 满足 window[c] == need[c] 时，formed += 1\n  - 当收缩导致 window[c] < need[c] 时，formed -= 1\n\n窗口“有效/覆盖”判定：\n- window_valid ⇔ formed == required\n\n伪代码（必须背下来的骨架）：\n```text\nneed = count(t)\nwindow = empty count map\nrequired = len(need)\nformed = 0\n\nl = 0\nbestLen = +inf\nbestL = 0\n\nfor r in [0..len(s)-1]:\n    ch = s[r]\n    window[ch] += 1\n    if ch in need and window[ch] == need[ch]:\n        formed += 1\n\n    while formed == required:          # 窗口已覆盖 t，开始尽量缩短\n        if (r - l + 1) < bestLen:\n            bestLen = r - l + 1\n            bestL = l\n\n        leftCh = s[l]\n        window[leftCh] -= 1\n        if leftCh in need and window[leftCh] < need[leftCh]:\n            formed -= 1\n        l += 1\n\nreturn \"\" if bestLen == +inf else s[bestL : bestL + bestLen]\n```\n\n中文解释（为什么有效）：\n- r 的作用：不断扩张直到满足覆盖（formed==required）。\n- l 的作用：一旦覆盖，就尽量把窗口缩短到“刚好覆盖”为止；缩短过程中更新最优。\n- formed/required 的作用：把“是否覆盖 t”从 O(字符集) 的遍历变成 O(1) 的判断。\n\n复杂度：\n- 时间 O(|s| + |t|)：l 和 r 都只单调前进，每个字符最多进窗口/出窗口一次。\n- 空间 O(|字符集|) 或 O(|need|)。",
-    "check": "问1：为什么这题的收缩循环是 while(window_valid) 而不是 while(window_invalid)？\n答1：因为目标是最短。一旦窗口已经覆盖 t（valid），继续保留多余字符只会让答案更差，所以必须在 valid 时尽可能收缩，并在收缩过程中不断更新最短答案。\n\n问2：formed 和 required 分别代表什么？为什么能用 formed==required 判断窗口覆盖 t？\n答2：required 是 t 中需要满足的“不同字符种类数”；formed 是当前窗口中已经满足数量要求的字符种类数（当 window[c] 达到 need[c] 记为满足，跌破则不满足）。当 formed==required，说明每一种需要的字符都已满足数量要求，因此窗口覆盖 t。\n\n问3：为什么判断 formed 增减时用 window[c] == need[c]（以及收缩时 window[c] < need[c]）而不是每次重新扫描 need？\n答3：这是把覆盖判定从重复扫描转换为增量维护。只在某个字符的计数跨过“满足阈值”时更新 formed，使每次移动指针的更新都是 O(1)，整体保持 O(|s|)。",
     "tags": [
       "sliding_window",
       "hashmap",
@@ -372,8 +332,6 @@
     "type": "pattern",
     "topic": "monotonic_stack_next_greater",
     "difficulty": 3,
-    "front": "单调栈模板：Daily Temperatures（下一个更大值 / Next Greater Element）\n\n目标：对每个位置 i，找到右侧第一个比 temperatures[i] 更大的位置 j，结果为 j - i；若不存在则为 0。\n\n核心思想：\n- 使用「单调递减栈」存放索引，表示这些位置的温度还没有找到更高的未来一天。\n- 当遇到一个更高温度时，它会一次性解决栈顶若干个更低温度的位置。\n\n伪代码：\n```text\nn = len(temperatures)\nres = [0] * n\nstack = empty stack   # 存索引，且 temperatures[stack] 递减\n\nfor i in [0..n-1]:\n    while stack 非空 且 temperatures[i] > temperatures[stack.top]:\n        idx = stack.pop()\n        res[idx] = i - idx   # 当前 i 就是 idx 的下一个更高温度\n    stack.push(i)\n\nreturn res\n```\n\n中文解释：\n1) 栈中存的是“还没找到更高温度的天数索引”，并且对应温度保持递减。\n2) 当新温度比栈顶更高时，说明它是栈顶那一天的第一个更热日子，可以立刻结算答案并出栈。\n3) 每个索引只会入栈一次、出栈一次，因此整体时间复杂度是 O(n)。\n4) 遍历结束后，栈中剩余的索引右侧都没有更高温度，对应结果自然是 0。",
-    "check": "问1：为什么要使用“单调递减栈”，而不是递增栈？\n答1：因为我们要找的是“右侧第一个更大的值”。保持递减栈可以保证：一旦遇到更大的温度，它一定能成为栈顶（以及可能更多元素）的下一个更大值，从而一次性结算答案。\n\n问2：为什么在元素出栈时，答案就已经确定？\n答2：因为当前索引 i 是从左到右扫描过程中遇到的第一个比栈顶索引更大的温度位置，且中间不存在更大的值，所以 i 就是该索引的最近、更早的“下一个更高温度”。\n\n问3：为什么整体时间复杂度是 O(n) 而不是 O(n^2)？\n答3：因为每个索引最多只会被压栈一次、弹栈一次，所有 while 循环中的弹栈操作加起来不超过 n 次，总操作数是线性的。",
     "tags": [
       "stack",
       "monotonic_stack",
@@ -391,8 +349,6 @@
     "type": "micro",
     "topic": "python_zip_sorted_reversed",
     "difficulty": 2,
-    "front": "Python micro：zip + sorted + reversed 的组合语义（为算法准备有序结构化数据）\n\n在算法题中，常需要把多个相关数组合并成结构化对象，并按某个维度排序后再反向扫描。`zip → sorted → reversed` 是一条非常常见且高效的组合。\n\n典型使用场景：\n- 多数组表示同一实体（如 position + speed）\n- 先按某一维排序，再从右向左处理（如 Car Fleet、单调结构）\n\n完整示例：\n```text\nposition = [4, 1, 7]\nspeed = [2, 2, 1]\n\npairs = zip(position, speed)\n# [(4,2), (1,2), (7,1)]  ← 逻辑上的“车”对象\n\nsorted_pairs = sorted(pairs)\n# [(1,2), (4,2), (7,1)]  ← 按 position 从小到大排序\n\nfor pos, sp in reversed(sorted_pairs):\n    print(pos, sp)\n# 输出顺序：\n# (7,1)\n# (4,2)\n# (1,2)\n```\n\n分步语义拆解：\n1) zip：把多个数组按索引并行打包，形成结构化数据（tuple）。\n2) sorted：对结构化数据按 tuple 的第一个元素（默认）建立全局顺序。\n3) reversed：从“最右侧 / 最靠后的元素”开始遍历，常用于“前方元素决定后方命运”的问题。\n\n在 Car Fleet 中的含义：\n- zip：把 position 和 speed 合成一辆车\n- sorted：按位置从后到前建立道路顺序\n- reversed：从最靠近终点的车开始处理车队合并",
-    "check": "问：为什么在 Car Fleet 中常写成 `for pos, sp in reversed(sorted(zip(position, speed)))`？\n答：因为需要先把 position 和 speed 组合成“车”的结构（zip），再按 position 建立从后到前的道路顺序（sorted），最后从最靠近终点的车开始扫描（reversed），这正好符合“不能超车、前车决定后车命运”的问题约束。",
     "tags": [
       "python",
       "sorting",
@@ -410,8 +366,6 @@
     "type": "pattern",
     "topic": "monotonic_stack_framework",
     "difficulty": 4,
-    "front": "单调栈通用模板（Monotonic Stack Framework）\n\n适用问题信号：\n- 需要为每个元素找到「左/右第一个更大/更小」(Next Greater/Smaller)\n- 或需要确定一个元素作为“极值”（最小/最大）时能扩展到的左右边界（如 Histogram 最大矩形、子数组贡献）\n\n核心思想：\n- 栈里存索引 idx，保持 nums[idx] 单调（递增或递减）。\n- 当新元素破坏单调性时，说明栈顶元素的“右边界”被找到（就是当前 i），此时可以出栈并结算。\n- 出栈后新的栈顶（若存在）就是该元素的“左边界”。\n\n模板 A：求右侧第一个更大值（Next Greater）— 单调递减栈\n```text\nstack = empty   # 存索引，值保持递减（nums[stack] 递减）\nans = default\n\nfor i in [0..n-1]:\n    while stack 非空 且 nums[i] > nums[stack.top]:\n        j = stack.pop()\n        ans[j] = i  或  i - j  或 nums[i]  # 取决于题目要索引/距离/值\n    stack.push(i)\n```\n中文解释：\n- 递减栈保证栈顶是“最近的、比当前小”的候选；当前 nums[i] 一旦更大，就能一次性解决一批等待更大值的元素。\n\n模板 B：求左右第一个更小值/左右边界 — 单调递增栈（Histogram/区间扩展类）\n```text\nappend a sentinel (e.g., 0) to force flushing\nstack = empty   # 存索引，值保持递增（nums[stack] 递增）\n\nfor i in [0..n]:\n    while stack 非空 且 nums[i] < nums[stack.top]:\n        idx = stack.pop()\n        right = i\n        left = stack.top if stack 非空 else -1\n        width = right - left - 1\n        # 用 nums[idx] 作为“极值/高度”结算贡献或面积\n    stack.push(i)\n```\n中文解释：\n- 递增栈保证：当遇到更小值时，栈顶元素第一次被“截断”，其右边界就是 i。\n- 出栈后新的栈顶是它左侧最近更小值，左右边界齐全，能立刻计算最大扩展宽度/贡献。\n\n选择递增还是递减的口诀：\n- 你要找「下一个更大」→ 用递减栈（遇到更大就弹出）\n- 你要找「下一个更小 / 边界被更小截断」→ 用递增栈（遇到更小就弹出）",
-    "check": "问1：单调栈里为什么通常存“索引”而不是直接存“值”？\n答1：因为很多题需要输出距离（i-j）、区间宽度（right-left-1）或写回对应位置的答案。存索引能同时取值和计算位置关系，信息更完整。\n\n问2：为什么“当新元素破坏单调性并触发 pop”时，可以立刻结算被 pop 的元素？\n答2：因为这是第一次遇到能破坏它单调关系的元素：对 Next Greater 来说，当前 i 是 j 右侧第一个更大值；对边界类来说，当前 i 是 idx 右侧第一个更小值。左边界也由出栈后的新栈顶给出，因此边界在 pop 时已经完整。\n\n问3：为什么 Histogram/边界类常加一个哨兵（sentinel，如末尾追加 0）？\n答3：因为遍历结束时栈里可能还有递增元素没有被更小值触发弹出；追加一个足够小的哨兵会强制触发所有剩余元素出栈结算，避免漏算最大面积/贡献。",
     "tags": [
       "stack",
       "monotonic_stack",
@@ -429,8 +383,6 @@
     "type": "pattern",
     "topic": "binary_search_framework",
     "difficulty": 3,
-    "front": "二分搜索通用模板（Binary Search Framework）\n\n适用问题信号：\n- 数据有序（数组有序 / 隐含单调性）\n- 需要在 O(log n) 时间内查找目标或边界\n- 每一步可以根据 mid 的判断，安全地丢弃一半搜索区间\n\n核心不变量（必须始终成立）：\n- 如果 target 存在，那么它一定在当前搜索区间内\n\n最稳妥写法：闭区间 [l, r]\n\n伪代码（基础存在性查找）：\n```text\nl = 0\nr = n - 1\n\nwhile l <= r:\n    mid = (l + r) // 2\n    if nums[mid] == target:\n        return mid\n    elif nums[mid] < target:\n        l = mid + 1      # 丢弃左半边（含 mid）\n    else:\n        r = mid - 1      # 丢弃右半边（含 mid）\n\nreturn -1\n```\n\n中文解释：\n1) 使用闭区间 [l, r]，保证当 l == r 时，区间内仍有一个候选元素需要检查。\n2) 每次通过 mid 与 target 的比较，确定哪一半区间不可能包含 target，并彻底丢弃。\n3) 更新 l 或 r 时必须使用 mid + 1 / mid - 1，确保区间严格缩小，避免死循环。\n4) 循环结束条件 l > r 表示搜索区间为空，此时 target 不存在。\n\n这是所有二分搜索变体的基础模板。",
-    "check": "问1：为什么 while 条件是 l <= r，而不是 l < r？\n答1：因为闭区间 [l, r] 在 l == r 时仍包含一个有效元素。如果用 l < r，会漏掉最后一个候选位置。\n\n问2：为什么更新边界时必须写成 l = mid + 1 或 r = mid - 1？\n答2：因为 mid 已经被比较过，不可能再是答案；如果不跳过 mid，区间不会缩小，可能导致死循环。\n\n问3：二分搜索中最重要的不变量是什么？\n答3：在每一轮循环开始时，必须保证：如果 target 存在，它一定在当前的搜索区间内；所有边界更新都必须维护这一点。",
     "tags": [
       "binary_search",
       "array",
@@ -448,8 +400,6 @@
     "type": "pattern",
     "topic": "binary_search_on_answer",
     "difficulty": 4,
-    "front": "Binary Search on Answer / Value（对答案空间做二分）\n\n适用问题信号：\n- 不是在数组索引上查找，而是在“答案的取值范围”中找一个数\n- 对某个值 x，可以写出一个判定函数 f(x)，判断“x 是否可行”\n- f(x) 对 x 具有单调性（False → True 或 True → False）\n\n核心思想：\n- 把问题转化为：在一个有序的值域中，找到第一个满足条件的值（或最后一个）\n- 二分的不是数组位置，而是“答案本身”\n\n典型判定函数形式：\n- f(x) = 是否能在限制 x 下完成任务\n- f(x) = 是否存在 count(nums <= x) > x\n\n模板（寻找最小可行值 / 左边界）：\n```text\nl = 最小可能答案\nr = 最大可能答案\n\nwhile l < r:\n    mid = (l + r) // 2\n    if f(mid) == True:\n        r = mid        # mid 仍然可能是答案，保留\n    else:\n        l = mid + 1    # mid 不可行，丢弃\n\nreturn l\n```\n\n中文解释：\n1) 搜索区间表示“答案一定在 [l, r] 内”，这是整个二分过程的不变量。\n2) 当 f(mid) 为 True 时，说明 mid 已经可行，但不确定是否是最小，因此不能丢弃 mid，只能收缩右边界。\n3) 当 f(mid) 为 False 时，mid 以及更小的值都不可行，可以直接丢弃左半区间。\n4) 使用 while l < r 而不是 <=，是因为目标是把区间收缩到唯一的一个答案值，而不是检查某个点是否存在。\n\n常见题型示例：\n- Find the Duplicate Number（按值域 + 计数）\n- Koko Eating Bananas（最小可行速度）\n- Capacity To Ship Packages（最小可行容量）\n- Split Array Largest Sum（最小最大子数组和）",
-    "check": "问1：为什么 Binary Search on Answer 通常使用 while l < r，而不是 l <= r？\n答1：因为目标是把搜索区间不断收缩到唯一的一个答案值，而不是在区间内检查某个具体位置是否存在。l == r 时区间已经确定，不需要再继续分。\n\n问2：为什么在 f(mid) 为 True 时要写 r = mid，而不是 r = mid - 1？\n答2：因为 mid 本身已经是一个可行答案，而我们要找的是“最小可行值”。如果直接写 r = mid - 1，会错误地丢弃真正的答案。\n\n问3：这类二分最重要的不变量是什么？\n答3：在每一轮循环开始时，必须保证：真正的答案一定落在当前的搜索区间 [l, r] 内；所有边界更新都必须维护这一点。",
     "tags": [
       "binary_search",
       "answer_space",
@@ -467,8 +417,6 @@
     "type": "micro",
     "topic": "python_math_ceil",
     "difficulty": 2,
-    "front": "Python micro：math.ceil 的语义与算法使用场景\n\nmath.ceil(x) 返回“不小于 x 的最小整数”（向上取整）。它常用于：\n- 把“除法结果”转换为“至少需要多少单位时间 / 次数 / 容量”\n- Binary Search on Answer 中的可行性判断（是否在限制内完成）\n\n核心语义：\n- ceil 表示：即使不能整除，也必须多花 1 个单位\n\n基础示例：\n```text\nimport math\n\nmath.ceil(3.0)   # 3\nmath.ceil(3.1)   # 4\nmath.ceil(3.9)   # 4\n```\n\n算法场景示例（Koko Eating Bananas）：\n```text\np = 7   # 香蕉堆大小\nk = 3   # 每小时吃 k 根\n\nhours = math.ceil(p / k)\n# p/k = 2.333...\n# 需要 3 小时才能吃完\n```\n\n为什么不能直接用整除：\n```text\np // k = 2   # 错误：低估所需时间\n```\n\n常见等价写法（无需 math.ceil）：\n```text\n# 对正整数 p, k\nhours = (p + k - 1) // k\n```\n\n在 Koko 中的完整含义：\n- 对每一堆 p：需要 ceil(p / k) 小时\n- 累加所有堆的时间，判断是否 <= h\n- 因为每一小时最多只能吃一堆，所以必须向上取整",
-    "check": "问1：为什么在 Koko Eating Bananas 中必须使用 ceil(p / k) 而不能用 p // k？\n答1：因为如果 p 不能被 k 整除，剩余的香蕉仍然需要额外 1 小时才能吃完；使用整除会低估真实所需时间，导致错误判断可行性。\n\n问2：为什么 (p + k - 1) // k 与 ceil(p / k) 等价（在 p、k 为正整数时）？\n答2：因为给分子加上 k-1 可以保证：只要 p 不是 k 的整数倍，就会进位到下一个整数倍，从而实现向上取整的效果。",
     "tags": [
       "python",
       "math",
@@ -486,8 +434,6 @@
     "type": "pattern",
     "topic": "binary_search_rotated_sorted_array",
     "difficulty": 4,
-    "front": "Rotated Sorted Array 二分模板（Search in Rotated Sorted Array）\n\n问题特征：\n- 原本是升序数组，但被旋转一次（存在一个断点）\n- 仍要求 O(log n) 查找 target\n\n核心不变量：\n- 如果 target 存在，则一定在当前区间 [l, r] 内\n\n关键洞察（恢复局部有序性）：\n- 在任意区间 [l, r] 中，取 mid 后，左右两半至少有一半是有序的：\n  - 若 nums[l] <= nums[mid]：左半 [l..mid] 有序\n  - 否则：右半 [mid..r] 有序\n\n模板伪代码：\n```text\nl = 0\nr = n - 1\n\nwhile l <= r:\n    mid = (l + r) // 2\n    if nums[mid] == target:\n        return mid\n\n    if nums[l] <= nums[mid]:                 # 左半有序\n        if nums[l] <= target < nums[mid]:\n            r = mid - 1                      # target 在左半\n        else:\n            l = mid + 1                      # target 在右半\n    else:                                     # 右半有序\n        if nums[mid] < target <= nums[r]:\n            l = mid + 1                      # target 在右半\n        else:\n            r = mid - 1                      # target 在左半\n\nreturn -1\n```\n\n中文解释：\n1) 先检查 mid 是否命中。\n2) 再判断哪一半是“单调有序”的（用 nums[l] 与 nums[mid] 比较）。\n3) 对有序半边做一次“区间包含判断”：target 若落在该有序区间内，则保留该半边；否则丢弃它。\n4) 每次更新都使用 mid ± 1，保证区间严格缩小，避免死循环。\n\n注意：该模板假设数组元素互不相同（distinct）。若允许重复，需要额外处理 nums[l] == nums[mid] == nums[r] 的退化情况。",
-    "check": "问1：为什么必须先判断 nums[l] <= nums[mid] 来确定哪一半有序？\n答1：因为旋转数组整体不再全局有序，无法仅凭 nums[mid] 与 target 的大小关系安全丢弃一半；但“左右至少一半有序”恒成立，先找出有序半边，才能用区间包含关系正确地丢弃另一半。\n\n问2：当左半有序时，如何判断 target 应该留在左半还是去右半？\n答2：如果 nums[l] <= target < nums[mid]，说明 target 落在左半有序区间内，应收缩右边界 r = mid - 1；否则 target 不在左半，应丢弃左半并令 l = mid + 1。\n\n问3：这题为什么仍然是 O(log n)？\n答3：因为每一轮都能确定并丢弃至少一半区间（通过“有序半边 + 区间包含判断”），并且边界用 mid±1 严格收缩，所以迭代次数是对数级。",
     "tags": [
       "binary_search",
       "rotated_array",
@@ -505,8 +451,6 @@
     "type": "pattern",
     "topic": "interval_insert_merge",
     "difficulty": 3,
-    "front": "Interval 插入与合并模板（Insert Interval）\n\n问题特征：\n- 已有区间按 start 升序排列\n- 插入一个新区间，并与所有重叠区间合并\n- 要求一次线性扫描完成（O(n)）\n\n核心思想（三段式扫描，不变量驱动）：\n- 第一段：收集完全在新区间左侧、必不重叠的区间\n- 第二段：合并所有与新区间重叠的区间（不断扩展新区间）\n- 第三段：收集完全在新区间右侧、不重叠的区间\n\n伪代码：\n```text\ni = 0\nres = []\n\n# 1) 左侧不重叠：end < newStart\nwhile i < n and intervals[i].end < new.start:\n    res.append(intervals[i])\n    i += 1\n\n# 2) 重叠合并：newEnd >= curStart\nwhile i < n and new.end >= intervals[i].start:\n    new.start = min(new.start, intervals[i].start)\n    new.end   = max(new.end,   intervals[i].end)\n    i += 1\nres.append(new)\n\n# 3) 右侧不重叠：直接加入\nwhile i < n:\n    res.append(intervals[i])\n    i += 1\n\nreturn res\n```\n\n中文解释：\n1) 第一段使用严格不重叠条件 `end < newStart`，保证这些区间永远不可能与新区间合并，安全直接加入结果。\n2) 第二段合并重叠区间：由于第一段已排除左侧不重叠，重叠只需检查 `newEnd >= curStart`；不断扩展 new 的左右边界即可。\n3) 第二段结束时，new 已吸收所有能重叠的区间；剩余区间必在右侧且不重叠，直接加入。\n4) 指针 i 单调递增，整体一次扫描完成。",
-    "check": "问1：为什么第一段使用 `interval.end < new.start`（严格小于）？\n答1：区间是闭区间语义 `[start, end]`。只有当 end < new.start 时才保证绝对不重叠；若相等（end == new.start）则应视为重叠并合并。\n\n问2：为什么第二段只检查 `new.end >= cur.start` 就够了？\n答2：因为第一段已经确保当前区间不在左侧不重叠区间中，隐含保证 `cur.end >= new.start`。因此重叠判定只需检查另一半条件。\n\n问3：为什么可以在合并过程中原地修改 newInterval？\n答3：因为 newInterval 的最终形态只依赖于所有与之重叠的区间的最小 start 与最大 end；原地扩展能减少额外状态并保持 O(1) 额外空间。",
     "tags": [
       "interval",
       "merge",
@@ -524,8 +468,6 @@
     "type": "micro",
     "topic": "python_lambda_sort_key",
     "difficulty": 2,
-    "front": "Python micro：lambda + sort(key=...) 的用法（自定义排序依据）\n\n在 Python 中，list.sort(key=...) 会对列表原地排序。key 参数是一个函数：它接收列表中的每个元素，并返回一个“排序键”。排序实际上是按这个键进行比较。\n\nlambda 是匿名函数语法，常用于写很短的 key 函数。\n\n示例：按区间 start 排序\n```text\nintervals = [[5,7], [1,3], [1,5], [6,7]]\n\nintervals.sort(key=lambda x: x[0])\n# key=lambda x: x[0] 表示：每个元素 x 是 [start, end]，取 x[0] 作为排序键\n\n# 排序后：\n# [[1,3], [1,5], [5,7], [6,7]]\n```\n\n示例：按 start 再按 end 排序（更明确）\n```text\nintervals = [[1,5], [1,3], [2,2]]\nintervals.sort(key=lambda x: (x[0], x[1]))\n# [[1,3], [1,5], [2,2]]\n```\n\n相关对比：\n- list.sort(...)：原地排序，返回 None\n- sorted(...)：返回新列表，不修改原列表\n\n算法场景：\n- Interval 题（Merge/Insert）通常第一步先按 start 排序，保证只需线性扫描并比较相邻区间即可完成合并。",
-    "check": "问1：`intervals.sort(key=lambda x: x[0])` 的含义是什么？\n答1：对 intervals 原地排序；对每个区间 x=[start,end]，用 x[0]（start）作为排序依据，因此按 start 升序排列。\n\n问2：`list.sort` 和 `sorted` 的区别是什么？\n答2：list.sort 原地排序并返回 None；sorted 返回排序后的新列表，不修改原列表。\n\n问3：如果想按 start 相同的情况下再按 end 排序，应怎么写？\n答3：使用元组作为键：`intervals.sort(key=lambda x: (x[0], x[1]))`。",
     "tags": [
       "python",
       "sorting",
@@ -543,8 +485,6 @@
     "type": "pattern",
     "topic": "min_heap_interval_scheduling",
     "difficulty": 4,
-    "front": "最小堆调度模板（Interval Scheduling with Min-Heap）\n\n适用问题信号：\n- 给定一组区间（start, end）\n- 需要分配“最少资源”（会议室、机器、线程等）\n- 区间之间不能重叠使用同一资源\n\n核心思想（贪心 + 最小堆）：\n- 永远优先复用“最早结束”的资源\n- 如果它都无法复用，那么任何其他资源也无法复用\n\n最小堆中存什么：\n- heap 中的每个元素表示“一个资源当前被占用到的结束时间”\n- heap[0] 永远是最早释放的资源\n\n标准流程：\n1) 按 start 时间排序所有区间\n2) 维护一个最小堆（按 end 排序）\n3) 依次处理每个区间，尝试复用资源\n\n伪代码：\n```text\nsort intervals by start\nheap = empty min-heap   # store end times\n\nfor each interval (s, e):\n    if heap not empty and heap.min <= s:\n        pop heap         # 复用最早结束的资源\n    push e into heap     # 当前区间占用一个资源\n\nreturn heap.size\n```\n\n为什么贪心是正确的：\n- 若最早结束的资源都无法复用（end > s），\n  那么结束更晚的资源一定也无法复用\n- 若可以复用，复用“结束最早”的资源会为未来留下最大余量\n\n最小堆行为示例：\n```text\nintervals = [(0,30), (5,10), (15,20)]\n\n处理 (0,30):\nheap = [30]\n\n处理 (5,10):\nheap[0]=30 > 5 → 无法复用\npush 10 → heap = [10,30]\n\n处理 (15,20):\nheap[0]=10 <= 15 → pop 10\npush 20 → heap = [20,30]\n\n最终 heap.size = 2\n```\n\n最重要的不变量：\n- heap.size = 当前正在使用的资源数\n- 在该模板中，heap.size 单调不减（pop 后必有 push）",
-    "check": "问1：为什么只需要比较 heap[0]（最小 end）就能决定是否复用资源？\n答1：因为 heap[0] 是所有资源中最早释放的那个；如果它都无法复用（end > start），那么结束更晚的资源一定也无法复用。\n\n问2：为什么在 Min Meeting Rooms 中可以直接 return heap.size，而不必记录历史最大值？\n答2：因为在该算法结构下，每次 pop 之后必定紧接一次 push，heap 的大小只可能增加或保持不变，不会减少；因此最终 heap.size 就等于整个过程中所需的最大资源数。\n\n问3：哪些变体中必须记录 max(heap.size) 而不能直接返回 heap.size？\n答3：当算法允许在一次迭代中连续 pop 多个元素（例如 while heap[0] <= start: pop）时，heap.size 可能下降，此时必须在过程中记录历史峰值。\n\n问4：为什么这类问题第一步必须按 start 排序？\n答4：因为调度决策必须沿着时间线推进；只有按 start 排序，才能保证当前区间之前的所有区间都已经做过资源分配决策。",
     "tags": [
       "heap",
       "interval",
@@ -563,8 +503,6 @@
     "type": "micro",
     "topic": "python_min_heap_heapq",
     "difficulty": 2,
-    "front": "Python micro：最小堆（heapq）的基本用法与行为语义\n\nPython 标准库 `heapq` 提供的是「最小堆」（min-heap）：\n- heap[0] 永远是当前堆中的最小元素\n- 内部用数组实现，但逻辑上满足堆性质\n\n最常用的四个操作：\n\n1) 创建一个空最小堆\n```text\nimport heapq\nheap = []\n```\n\n2) push（压入元素）\n```text\nheapq.heappush(heap, 10)\nheapq.heappush(heap, 5)\nheapq.heappush(heap, 7)\n# heap 逻辑上表示：[5, 10, 7]\n# heap[0] == 5\n```\n\n语义：\n- 插入一个元素\n- 自动调整堆结构，保证最小值在 heap[0]\n\n3) pop（弹出最小元素）\n```text\nx = heapq.heappop(heap)\n# x == 5\n# heap 逻辑上变为：[7, 10]\n```\n\n语义：\n- 移除并返回当前最小的元素\n- 时间复杂度 O(log n)\n\n4) 访问最小值（不弹出）\n```text\nmin_val = heap[0]\n```\n\n语义：\n- O(1) 查看当前最小元素\n- 不改变堆结构\n\n典型算法使用模式（调度 / 区间问题）：\n```text\n# heap 存“结束时间”\nfor (start, end) in intervals:\n    if heap and heap[0] <= start:\n        heapq.heappop(heap)   # 释放最早结束的资源\n    heapq.heappush(heap, end) # 占用资源直到 end\n```\n\n常见注意点：\n- heapq 只提供最小堆，没有直接的最大堆\n- 若需要最大堆，常见做法是 push 负数：push(-x)\n- heap 本身不是完全排序的数组，只有 heap[0] 有顺序保证",
-    "check": "问1：为什么 heapq 默认实现的是最小堆而不是最大堆？\n答1：这是 Python 标准库的设计选择，最小堆更通用；需要最大堆时可以通过存负数或存 (priority, value) 元组来实现。\n\n问2：为什么不能直接对 heap 使用 sort 后再当堆用？\n答2：因为堆的核心价值在于支持 O(log n) 的 push/pop 最小值；如果每次 sort，复杂度会退化为 O(n log n)。\n\n问3：在调度类问题中，heap 中通常存什么？\n答3：通常存“结束时间”或“当前资源释放时间”，因为是否能复用资源只取决于最早结束的那个。",
     "tags": [
       "python",
       "heap",
@@ -582,8 +520,6 @@
     "type": "pattern",
     "topic": "dynamic_programming_master_template",
     "difficulty": 4,
-    "front": "动态规划（DP）母模板｜刷题强执行版\n\nDP 的本质：\n- 当前问题的解，由“规模更小的同类问题”推导而来\n- 每一个 dp 状态，都必须有清晰、可验证的语义\n\n⚠️ 刷题时不要背公式，必须走完整流程\n\n====================\nDP 五步强执行模板\n====================\n\nStep 0：判断是否为 DP 问题\n- 是否要求最优值 / 方案数 / 可达性？\n- 是否存在重叠子问题？\n- 是否能把问题拆成更小规模的同类问题？\n\n若以上成立，优先考虑 DP（否则可能是贪心 / 搜索）\n\n--------------------\nStep 1：定义 dp 状态（最重要）\n必须能用一句话精确定义：\n\n\"dp[i] / dp[i][j] 表示什么？\"\n\n要求：\n- 包含约束条件（前 i 个 / 以 i 结尾 / 容量为 j）\n- 不允许模糊描述（如“到第 i 个的最优值”）\n\n示例：\n```text\ndp[i] = 以 i 结尾的最大连续子数组和\ndp[i][j] = 前 i 个物品，在容量为 j 时的最大价值\n```\n\n--------------------\nStep 2：写递推公式（只在这一步用数学）\n回答一个问题：\n\n\"当前状态 dp[...]，是从哪些更小状态推导出来的？\"\n\n常见形式：\n```text\ndp[i] = max(dp[i-1], dp[i-2] + x)\ndp[i][j] = max(dp[i-1][j], dp[i-1][j-w] + v)\n```\n\n⚠️ 递推公式必须与 Step 1 的状态定义严格一致\n\n--------------------\nStep 3：dp 初始化\n由【状态定义 + 递推公式】共同决定\n\n常问问题：\n- 最小规模问题是什么？\n- dp[0] / dp[1] 代表什么？\n\n示例：\n```text\ndp[0] = nums[0]\ndp[0][0] = 0\n```\n\n--------------------\nStep 4：确定遍历顺序\n核心原则：\n\n\"dp 当前状态依赖的状态，必须先被计算\"\n\n常见规则：\n- 依赖 i-1 → i 正序\n- 依赖 i+1 → i 逆序\n- 01 背包 → j 逆序\n- 完全背包 → j 正序\n\n--------------------\nStep 5：手推 + Debug\n- 手推一个最小样例，写出 dp 表变化\n- 写代码\n- 若出错：打印 dp 数组，对照手推结果\n\n⚠️ 不允许在没手推 dp 的情况下“凭感觉改代码”\n",
-    "check": "问1：为什么 Step 1（定义 dp 状态）是 DP 中最重要的一步？\n答：因为递推公式、初始化和遍历顺序全部依赖 dp 状态的语义；一旦状态定义模糊，后续步骤即使“写对公式”也无法保证逻辑正确。\n\n问2：为什么不能只背状态转移公式就写 DP？\n答：因为同一个公式在不同状态定义下语义完全不同；如果不清楚 dp[i] 表示什么，就无法判断初始化是否正确、遍历顺序是否合理，代码一旦出错也无法 Debug。\n\n问3：DP 和贪心在刷题层面的本质区别是什么？\n答：DP 的每个状态都由前一个或更小规模的状态推导而来，存在明确的状态转移；贪心不维护状态，只基于当前局部信息直接选择最优。\n\n问4：DP 题目调试时最有效的方法是什么？\n答：打印 dp 数组并与手推结果对照；如果 dp 表和手推一致但结果错误，说明递推公式或初始化有问题；如果不一致，则是实现细节错误。",
     "tags": [
       "dp",
       "template",
@@ -601,8 +537,6 @@
     "type": "pattern",
     "topic": "dp_problem_space_cutting",
     "difficulty": 4,
-    "front": "DP 切割型问题（Problem Space Cutting）模式\n\n适用问题信号：\n- 存在“全局冲突约束”，无法直接写出线性 dp 状态\n- 常见表现：\n  - 环形数组（circular array）\n  - 首尾不能同时选\n  - A 与 B 不能同时发生\n  - 必须选 / 必须不选某个关键元素\n\n核心思想：\n- 与其在 dp 状态中强行表达复杂约束\n- 不如先“切割问题空间”，把冲突条件外置\n- 将原问题拆成若干个【互斥且完备】的子问题\n- 每个子问题都恢复为“无冲突的标准 DP”\n\n典型做法（以首尾冲突为例）：\n- 原问题：不能同时选择 index 0 和 index n-1\n- 切割为两种情况：\n  1) 不选第一个元素 → 只考虑区间 [1..n-1]\n  2) 不选最后一个元素 → 只考虑区间 [0..n-2]\n- 分别求解两个线性 DP，取最大值\n\n伪代码模板：\n```text\n# 原问题含有全局冲突约束\n\nans1 = solve(subproblem_excluding_A)\nans2 = solve(subproblem_excluding_B)\n\nreturn max(ans1, ans2)\n```\n\n示例：House Robber II（环形打家劫舍）\n```text\n# 首尾不能同时偷\nreturn max(rob(nums[1:]), rob(nums[:-1]))\n```\n\n为什么切割是正确的：\n- 所有合法解必然落在某一个子问题中（完备性）\n- 子问题之间互斥（不会重复计数非法解）\n- 每个子问题内部不再有冲突，可安全使用标准 DP",
-    "check": "问1：为什么切割后的子问题一定是“完备”的？\n答1：因为全局冲突条件强制所有合法解必须排除至少一个冲突元素（例如首或尾），所以所有合法解必然属于某一个切割分支。\n\n问2：为什么不直接在 dp 状态中处理首尾冲突？\n答2：因为首尾冲突是跨越整个状态空间的全局约束，会导致 dp 状态维度和转移复杂化；通过切割可以把约束外置，恢复线性 dp 结构。\n\n问3：DP 切割型问题常见于哪些结构？\n答3：环形数组、首尾相邻约束、互斥选择（A 与 B 不能同时选）、必须选或必须不选某个关键点的问题。\n\n问4：切割型 DP 与普通 DP 的核心区别是什么？\n答4：普通 DP 直接在状态中表达约束；切割型 DP 先按冲突条件分情况，把问题拆成多个无冲突子问题，再分别使用标准 DP。",
     "tags": [
       "dp",
       "problem_decomposition",
@@ -620,8 +554,6 @@
     "type": "micro",
     "topic": "python_2d_array_initialization",
     "difficulty": 2,
-    "front": "Python 二维数组初始化（避免引用共享陷阱）\n\n⚠️ 错误写法（会导致所有行共享同一个列表）：\n```text\ndp = [[False] * n] * n\n```\n\n等价于：\n```text\nrow = [False] * n\ndp = [row, row, row, ...]\n```\n\n此时：\n```text\ndp[0] is dp[1]  # True\n```\n\n修改一行会影响所有行：\n```text\ndp[0][1] = True\n# 所有 dp[*][1] 都会变成 True\n```\n\n--------------------\n\n✅ 正确写法（每一行是独立对象）：\n```text\ndp = [[False] * n for _ in range(n)]\n```\n\n此时：\n```text\ndp[0] is dp[1]  # False\n```\n\n每行互不影响。\n\n--------------------\n\n为什么会出问题？\n- list * n 只是复制“引用”，不是深拷贝\n- 所有行指向同一个内部列表\n\n--------------------\n\nDP 场景警告：\n- 二维 DP（区间 DP / 背包 / LCS）必须使用列表推导式\n- 否则状态转移会互相污染，难以 debug",
-    "check": "问1：为什么 `[[False]*n]*n` 是错误的二维数组初始化方式？\n答：因为 `* n` 复制的是列表引用，而不是创建新的列表对象，导致所有行共享同一个内部列表。\n\n问2：如何验证是否发生了引用共享？\n答：使用 `dp[0] is dp[1]`；若为 True，则说明行共享同一对象。\n\n问3：为什么这个问题在 DP 中特别危险？\n答：因为 DP 会频繁修改 dp[i][j]，若行共享，会导致多个状态同时被修改，使递推结果完全错误且难以排查。\n\n问4：二维数组安全初始化的标准写法是什么？\n答：`dp = [[init_value] * n for _ in range(n)]`。",
     "tags": [
       "python",
       "dp",
@@ -639,8 +571,6 @@
     "type": "micro",
     "topic": "dp_index_design_principle",
     "difficulty": 3,
-    "front": "DP 下标设计原则（避免边界混乱）\n\n核心原则：\n- 先定义 dp[i] 的“语义”，再决定数组长度\n- 优先使用“前 i 个元素”的定义，而不是“第 i 个元素”的定义\n\n推荐定义方式：\n```text\ndp[i] = 前 i 个元素的答案\n```\n\n这种定义的好处：\n- dp[0] 自然表示“空问题”\n- 转移 dp[i] += dp[i-1] 或 dp[i-2] 时不会越界\n\n示例（Decode Ways）：\n```text\ndp[i] = s 的前 i 个字符的解码方式数\n\ndp[0] = 1   # 空串有 1 种方式\n```\n\n若定义为：\n```text\ndp[i] = 以 i 结尾的解\n```\n则在 i=1 时访问 dp[i-2] 会越界。\n\n--------------------\n\n通用判断规则：\n- 若转移依赖 dp[i-2]、dp[i-k]\n- 建议构造 dp 长度为 n+1\n- 并让 dp[0] 代表“规模为 0 的合法子问题”\n\n--------------------\n\n常见空状态示例：\n- Decode Ways：空串\n- 爬楼梯：0 阶有 1 种方法\n- 背包问题：容量 0 时价值 0\n- 子数组问题：空前缀\n\n本质：\n- dp[0] 不是 hack\n- 而是为递推公式提供数学上的边界闭合",
-    "check": "问1：为什么在很多 DP 题中要定义 dp[0]？\n答：dp[0] 通常表示“规模为 0 的合法子问题”（例如空串、0 阶楼梯等），用于保证递推公式在边界处自然成立。\n\n问2：为什么推荐定义 dp[i] 为“前 i 个元素的答案”？\n答：这种定义能让 dp[0] 合法存在，避免 dp[i-2] 在 i=1 时越界，同时使转移公式统一、简洁。\n\n问3：什么时候需要 dp 长度为 n+1？\n答：当状态转移依赖 dp[i-1]、dp[i-2] 等更小规模问题时，通常使用 n+1 长度，并让 dp[0] 表示空问题。\n\n问4：dp[0] 的存在是否只是编码技巧？\n答：不是。它是为了让递推公式在数学上闭合，使状态转移在所有 i 上统一成立。",
     "tags": [
       "dp",
       "indexing",
@@ -658,8 +588,6 @@
     "type": "pattern",
     "topic": "complete_knapsack_pattern",
     "difficulty": 4,
-    "front": "完全背包（Complete Knapsack）模式\n\n问题信号：\n- 每种物品 / 硬币可以使用“无限次”\n- 求最小数量 / 最大价值 / 组合数\n- 子问题通常是 i - weight 或 amount - coin\n\n核心状态定义：\n```text\ndp[i] = 凑出金额 i 的最优解（最少数量 / 最大价值 / 组合数）\n```\n\n典型递推公式：\n```text\ndp[i] = min(dp[i], dp[i - coin] + 1)      # 求最少数量\n\ndp[i] = max(dp[i], dp[i - weight] + v)   # 求最大价值\n\ndp[i] += dp[i - coin]                    # 求组合数\n```\n\n关键区别：完全背包允许重复使用当前物品\n\n--------------------\n\n遍历顺序（核心！）\n\n完全背包（允许重复）：\n```text\nfor coin in coins:\n    for i in range(coin, amount + 1):\n        dp[i] = ... dp[i - coin] ...\n```\n\n或：\n```text\nfor i in range(amount + 1):\n    for coin in coins:\n        ...\n```\n\n⚠️ i 必须正序遍历\n\n--------------------\n\n对比：01 背包（每个物品只能用一次）\n\n```text\nfor coin in coins:\n    for i in range(amount, coin - 1, -1):\n        dp[i] = ... dp[i - coin] ...\n```\n\n⚠️ i 必须逆序遍历\n\n--------------------\n\n为什么完全背包必须正序？\n- 因为 dp[i] 依赖 dp[i - coin]\n- 若 i 逆序，则当前轮不会使用“更新后的 dp[i - coin]”\n- 会退化成 01 背包效果\n\n--------------------\n\n典型例题：\n- Coin Change（最少硬币数）\n- Coin Change II（组合数）\n- Combination Sum IV\n- 完全背包基础题",
-    "check": "问1：完全背包与 01 背包的本质区别是什么？\n答：完全背包允许同一物品使用无限次，而 01 背包每个物品只能使用一次。\n\n问2：为什么完全背包必须 i 正序遍历？\n答：因为 dp[i] 依赖 dp[i - coin]，正序遍历可以在同一轮中重复使用当前物品；若逆序遍历，会阻止重复使用，退化成 01 背包。\n\n问3：为什么 01 背包必须逆序遍历？\n答：逆序可以避免在同一轮中重复使用同一物品，保证每个物品只使用一次。\n\n问4：Coin Change 属于哪种背包？\n答：完全背包，因为每种硬币可以使用无限次。",
     "tags": [
       "dp",
       "knapsack",
@@ -677,8 +605,6 @@
     "type": "pattern",
     "topic": "grid_flood_fill_bfs_dfs",
     "difficulty": 3,
-    "front": "Grid Flood Fill（网格泛洪填充）母模板｜DFS/BFS 统一框架\n\n适用问题信号：\n- 网格（matrix / grid）中找连通块：岛屿数量、最大岛面积、封闭岛、区域计数\n- 连通方式通常是 4 方向（上下左右）或 8 方向\n- 本质是图的连通分量（Connected Components）\n\n核心思想：\n- 遍历所有格子\n- 命中“未访问且满足条件”的起点（例如 grid[i][j] == '1'）\n  → 计数/更新答案\n  → 从该点做 flood fill（DFS/BFS）把整个连通块标记为已访问\n\n推荐实现习惯：\n- 用 dirs 统一四方向，避免写 4 个 if\n- 优先“就地标记 visited”（把 '1' 改 '0'），省一个 seen 数组\n  - 若题目禁止修改输入，再用 seen[][]\n\n方向数组：\n```text\ndirs = [(1,0), (-1,0), (0,1), (0,-1)]\n```\n\n====================\nBFS 模板（更稳，不怕递归爆栈）\n====================\n```text\nres = 0\nfor each cell (i,j):\n    if grid[i][j] is target and not visited:\n        res += 1\n        mark visited(i,j)\n        queue = [(i,j)]\n        while queue not empty:\n            x,y = pop_left(queue)\n            for (dx,dy) in dirs:\n                nx,ny = x+dx, y+dy\n                if in_bounds(nx,ny) and grid[nx][ny] is target and not visited:\n                    mark visited(nx,ny)\n                    push(queue, (nx,ny))\nreturn res\n```\n\n====================\nDFS 模板（更短，适合小规模）\n====================\n```text\ndef dfs(x,y):\n    mark visited(x,y)\n    for (dx,dy) in dirs:\n        nx,ny = x+dx, y+dy\n        if in_bounds(nx,ny) and grid[nx][ny] is target and not visited:\n            dfs(nx,ny)\n\nres = 0\nfor each cell (i,j):\n    if grid[i][j] is target and not visited:\n        res += 1\n        dfs(i,j)\nreturn res\n```\n\n常见坑（必查）：\n- 条件必须写明确：grid[i][j] == '1'（不要写 if grid[i][j]，字符串 '0' 也为 True）\n- flood fill 扩展必须同时检查：边界 + target 类型 + visited\n- 4 方向 vs 8 方向题目要求不同\n- Python 递归 DFS 可能爆栈：大网格优先 BFS",
-    "check": "问1：为什么 flood fill 必须在扩展邻居时检查 grid[nx][ny] 是否是 target（例如 '1'）？\n答：否则会把水域/非目标格也标记为 visited，导致连通块被错误扩大，岛屿计数或面积结果偏小/偏大。\n\n问2：为什么不推荐写 `if grid[i][j]` 来判断陆地？\n答：因为 grid 元素通常是字符串 '0'/'1'，在 Python 中非空字符串都为 True，'0' 也会被当作 True，必须写 `grid[i][j] == '1'`。\n\n问3：什么时候优先 BFS 而不是递归 DFS？\n答：当网格可能较大或连通块很深时，递归 DFS 可能超过 Python 的递归深度限制；BFS 使用队列不会爆栈，更稳。\n\n问4：如果题目不允许修改输入 grid，visited 应该怎么做？\n答：使用 `seen = [[False]*n for _ in range(m)]`，并在访问时设置 seen[x][y] = True，同时扩展邻居时检查 `not seen[nx][ny]`。",
     "tags": [
       "graph",
       "grid",
@@ -698,8 +624,6 @@
     "type": "pattern",
     "topic": "multi_source_bfs_grid_distance",
     "difficulty": 4,
-    "front": "Multi-source BFS（网格最近距离）Pattern\n\n适用问题信号：\n- 网格中有多个“起点”（例如所有 0）\n- 需要给其它格子填“到最近起点的最短距离”\n- 图是无权图（每一步 cost = 1）\n- 只能上下左右移动（4 方向）\n\n核心思想：\n- 不要“从每个目标去找最近起点”（会超时）\n- 应该“从所有起点同时出发扩散”\n- 第一次到达某格子的距离，一定是最短距离（BFS 层序性质）\n\n================================\n母模板（必须记住的结构）\n================================\n\n伪代码：\n\n```text\n1) 初始化\nqueue = empty deque\n\nfor each cell (i,j):\n    if grid[i][j] 是起点:\n        queue.append((i,j))\n\n2) BFS 扩散\nwhile queue not empty:\n    x,y = pop_left(queue)\n    for (dx,dy) in dirs:\n        nx,ny = x+dx, y+dy\n        if in_bounds(nx,ny) and grid[nx][ny] 是“未访问目标格”:\n            grid[nx][ny] = grid[x][y] + 1\n            queue.append((nx,ny))\n```\n\n关键不变量：\n- queue 里始终是“当前层”的点\n- 每个格子只会被更新一次（第一次更新即最短距离）\n- 不需要 seen，只要用“是否仍是 INF”作为未访问判定\n\n================================\n为什么一定要多源？\n================================\n\n错误思路：\n- 对每个 INF 做 DFS/BFS 去找最近 0\n- 复杂度可能 O((mn)^2)\n\n正确思路：\n- 所有 0 同时入队\n- 扩散一层 = 距离 +1\n- 整体复杂度 O(mn)\n\n================================\n时间空间复杂度\n================================\n\n时间：O(mn)\n空间：O(mn)（最坏情况下队列装满网格）\n\n================================\n典型题型\n================================\n\n- Islands and Treasure（Walls and Gates）\n- 01 Matrix（求最近 0 的距离）\n- 最近警察 / 最近商店 / 最近信号源\n- 任意“最近某类节点”的网格最短路问题\n",
-    "check": "问1：为什么第一次更新某个格子的距离就是最短距离？\n答：因为 BFS 按层扩散，当前层所有节点的距离相同；当某格子第一次被访问时，一定是通过最少步数路径到达，因此是最短距离。\n\n问2：为什么不需要 seen 数组？\n答：因为我们只会从“未访问目标格”（例如 INF）更新一次；一旦它被赋值为距离，就不再是 INF，自然不会被再次入队，相当于隐式 visited。\n\n问3：为什么不能对每个 INF 单独做 DFS？\n答：那样会重复遍历大量相同区域，最坏复杂度接近 O((mn)^2)；多源 BFS 只遍历每个格子一次，总复杂度 O(mn)。",
     "tags": [
       "graph",
       "bfs",
@@ -718,8 +642,6 @@
     "type": "pattern",
     "topic": "topological_sort_kahn_cycle_detection",
     "difficulty": 4,
-    "front": "Topological Sort（Kahn BFS）= 有向图判环母模板\n\n适用问题信号：\n- 有前置依赖关系（a 依赖 b）\n- 课程安排 / 任务调度 / 构建顺序\n- 问“能否完成全部”或“是否存在合法顺序”\n\n核心抽象：\n- 把课程当作有向图节点\n- 边 b -> a 表示：必须先做 b 才能做 a\n- 问题等价于：图中是否存在环\n\n================================\n母模板（Kahn 入度 BFS）\n================================\n\n伪代码：\n\n```text\n1) 构建图\nadj = [[] for _ in range(n)]\nindegree = [0] * n\n\nfor (a, b) in prerequisites:\n    adj[b].append(a)\n    indegree[a] += 1\n\n2) 初始化队列\nqueue = 所有 indegree == 0 的节点\ncount = 0\n\n3) BFS 拓扑排序\nwhile queue not empty:\n    node = pop_left(queue)\n    count += 1\n    for nei in adj[node]:\n        indegree[nei] -= 1\n        if indegree[nei] == 0:\n            push(queue, nei)\n\n4) 判环\nif count == n:\n    return True   # 无环\nelse:\n    return False  # 有环\n```\n\n================================\n核心不变量\n================================\n\n- indegree[i] 表示：还欠多少前置\n- queue 中永远是“当前可以立即执行”的节点\n- 每个节点最多入队一次\n- 有环的节点永远不会变成 indegree == 0\n\n================================\n为什么能检测环？\n================================\n\n- 如果图无环，必然存在至少一个入度为 0 的点\n- 每移除一个点，相当于“删除它的出边”\n- 如果有环，环内所有节点入度都 >= 1\n- 队列会提前空掉，count < n\n\n================================\n复杂度\n================================\n\n时间：O(V + E)\n空间：O(V + E)\n\n================================\n典型题目\n================================\n\n- Course Schedule\n- Course Schedule II（返回拓扑序）\n- Task ordering / Build order\n- 任意“是否能完成所有任务”的依赖问题\n",
-    "check": "问1：为什么入度为 0 的节点一定可以先执行？\n答：因为它没有任何未完成的前置依赖，因此合法。\n\n问2：如果存在环，算法会发生什么？\n答：环内所有节点入度都 >=1，队列最终会空掉，但 count < n，因此判定失败。\n\n问3：为什么每个节点只会入队一次？\n答：因为 indegree 只会从正数减到 0 一次，一旦入队后不会再次变为 0。",
     "front_zh": "Topological Sort（Kahn BFS）= 有向图判环母模板\n\n适用问题信号：\n- 有前置依赖关系（a 依赖 b）\n- 课程安排 / 任务调度 / 构建顺序\n- 问“能否完成全部”或“是否存在合法顺序”\n\n核心抽象：\n- 把课程当作有向图节点\n- 边 b -> a 表示：必须先做 b 才能做 a\n- 问题等价于：图中是否存在环\n\n================================\n母模板（Kahn 入度 BFS）\n================================\n\n伪代码：\n\n```text\n1) 构建图\nadj = [[] for _ in range(n)]\nindegree = [0] * n\n\nfor (a, b) in prerequisites:\n    adj[b].append(a)\n    indegree[a] += 1\n\n2) 初始化队列\nqueue = 所有 indegree == 0 的节点\ncount = 0\n\n3) BFS 拓扑排序\nwhile queue not empty:\n    node = pop_left(queue)\n    count += 1\n    for nei in adj[node]:\n        indegree[nei] -= 1\n        if indegree[nei] == 0:\n            push(queue, nei)\n\n4) 判环\nif count == n:\n    return True   # 无环\nelse:\n    return False  # 有环\n```\n\n================================\n核心不变量\n================================\n\n- indegree[i] 表示：还欠多少前置\n- queue 中永远是“当前可以立即执行”的节点\n- 每个节点最多入队一次\n- 有环的节点永远不会变成 indegree == 0\n\n================================\n为什么能检测环？\n================================\n\n- 如果图无环，必然存在至少一个入度为 0 的点\n- 每移除一个点，相当于“删除它的出边”\n- 如果有环，环内所有节点入度都 >= 1\n- 队列会提前空掉，count < n\n\n================================\n复杂度\n================================\n\n时间：O(V + E)\n空间：O(V + E)\n\n================================\n典型题目\n================================\n\n- Course Schedule\n- Course Schedule II（返回拓扑序）\n- Task ordering / Build order\n- 任意“是否能完成所有任务”的依赖问题",
     "check_q_en": "问1：为什么入度为 0 的节点一定可以先执行？",
     "check_a_en": "答：因为它没有任何未完成的前置依赖，因此合法。 问2：如果存在环，算法会发生什么？ 答：环内所有节点入度都 >=1，队列最终会空掉，但 count < n，因此判定失败。 问3：为什么每个节点只会入队一次？ 答：因为 indegree 只会从正数减到 0 一次，一旦入队后不会再次变为 0。"
@@ -730,8 +652,6 @@
     "type": "pattern",
     "topic": "graph_valid_tree_union_find_connectivity",
     "difficulty": 3,
-    "front": "Graph Valid Tree（判断无向图是否为树）\n\n问题：给定 n 个节点（0..n-1）和若干无向边，判断是否构成一棵合法的树。\n\n核心判定条件（必要且充分）：\n1) 边数必须等于 n - 1\n2) 图必须连通（等价于：无环 + 连通）\n\n关键性质：\n- 对 n 个节点的无向图：若 edges == n - 1，则\n  连通 ⇔ 无环\n\n标准解法一（Union-Find）：\n- 若 len(edges) != n - 1 → 直接 False\n- 用并查集合并每条边\n- 若 union 过程中发现两个节点已在同一集合 → 有环 → False\n- 若全部成功合并 → True\n\n标准解法二（BFS/DFS）：\n- 若 len(edges) != n - 1 → 直接 False\n- 建邻接表\n- 从任意节点（如 0）做 BFS/DFS\n- 若最终访问节点数 == n → 连通 → True，否则 False",
-    "check": "问1：为什么树必须满足 edges == n - 1？\n答1：树是连通且无环的无向图。一个连通无向图若含有 n 个节点且无环，其边数必为 n - 1；若边数多于 n - 1 必有环，少于 n - 1 必不连通。\n\n问2：为什么在 edges == n - 1 的前提下，只需检查“连通”或“无环”其中之一？\n答2：因为对于无向图，若 edges == n - 1，则“连通”与“无环”等价。若连通且边数为 n - 1，则不可能存在环；若无环且边数为 n - 1，则必然连通。\n\n问3：Union-Find 在这题中的作用是什么？\n答3：用于检测是否存在环（若两个节点已在同一集合仍尝试合并，则形成环），并隐式维护连通分量。\n\n问4：为什么 BFS/DFS 版本不需要显式判环？\n答4：因为在已验证 edges == n - 1 的前提下，只需确认图是连通的即可；若连通且边数为 n - 1，则必为树。",
     "tags": [
       "graph",
       "union_find",
@@ -750,8 +670,6 @@
     "type": "pattern",
     "topic": "union_find_disjoint_set_basic_to_interview_template",
     "difficulty": 3,
-    "front": "并查集 Union-Find（Disjoint Set Union, DSU）｜小学生版 + 面试版模板\n\n====================\n一、它解决什么问题？\n====================\n并查集用来动态维护“哪些点属于同一个连通块/小团体”。\n\n你只要记住一句话：\n- find(x)：问 x 的“老大”是谁（x 属于哪个团体）\n- union(a,b)：把 a 和 b 的团体合并\n\n典型题：\n- 连通分量数量（Number of Connected Components）\n- 冗余边/判环（Redundant Connection）\n- 图是否是树（Graph Valid Tree）\n- Kruskal 最小生成树（MST）\n\n====================\n二、最直观的比喻（小学生版）\n====================\n每个人都有一个“上级/老大”。\n- 如果一个人的老大是自己：他就是团体老大\n- 找老大：一直问“你听谁的？”直到找到听自己的那个人\n\n用 parent 数组记录：\n- parent[x] = y 表示 x 听 y 的\n\n初始化：每个人都自己当老大\n- parent[x] = x\n\n====================\n三、核心操作\n====================\n(1) find(x)：找老大（根）\n- 一直沿着 parent 走，直到 parent[x] == x\n\n(2) union(a,b)：合并团体\n- 先找到 a 的老大 rootA 和 b 的老大 rootB\n- 如果 rootA == rootB：说明本来就在同一个团体\n  - 如果你“再连一次边”，就会形成环（cycle）\n- 否则，把一个老大挂到另一个老大下面，团体合并\n\n====================\n四、为什么 find(a)==find(b) 表示“加边会成环”？\n====================\n在无向图里：\n- 如果 a 和 b 已经在同一个连通块里，说明它们之间已经有一条路径\n- 你再加一条直接连接 a-b 的边，就把这条路径“闭合成圈”\n=> 一定出现环\n\n====================\n五、示例：一步步模拟（看懂就会写）\n====================\n例子 edges = [(1,2),(2,3),(3,4),(1,4)]\n\n初始：\nparent: 1->1, 2->2, 3->3, 4->4\n\n加 (1,2)：\nfind(1)=1, find(2)=2，不同 => 合并\n可能变成：parent[1]=2\n现在：1->2, 2->2\n\n加 (2,3)：\nfind(2)=2, find(3)=3，不同 => 合并\nparent[2]=3\n现在：1->2->3, 2->3, 3->3\n\n加 (3,4)：\nfind(3)=3, find(4)=4，不同 => 合并\nparent[3]=4\n现在：1->2->3->4\n\n加 (1,4)：\nfind(1)=4（一路找上去到 4）\nfind(4)=4\n相同 => 1 和 4 本来已经连通，再连会成环\n所以 (1,4) 是冗余边。\n\n====================\n六、两大进阶优化（面试常用）\n====================\n优化 A：路径压缩 Path Compression（find 时顺便“抄近路”）\n- 当你 find(x) 找到老大 root 后，把沿途节点直接指向 root\n- 下次 find 会非常快\n\n优化 B：按秩合并 Union by Rank（让矮树挂到高树）\n- rank 可以理解为“树的大概高度”\n- 合并时：矮的挂高的，树不会越长越高\n- 只有当两棵树 rank 一样时，合并后新树高度才会 +1\n\n你只要记住一句话：\n- rank 小的根，挂到 rank 大的根\n- rank 一样，随便挂一个，但被挂的那个根的 rank 不变，挂人的那个根 rank +1\n\n====================\n七、最终面试模板（强烈建议背）\n====================\n1) 节点是 0..n-1：开 parent = range(n)\n2) 节点是 1..n：开 parent = range(n+1)\n\n模板（路径压缩 + rank）：\n\nclass UF:\n    def __init__(self, n):\n        self.parent = list(range(n))\n        self.rank = [0] * n\n\n    def find(self, x):\n        if self.parent[x] != x:\n            self.parent[x] = self.find(self.parent[x])\n        return self.parent[x]\n\n    def union(self, a, b):\n        ra, rb = self.find(a), self.find(b)\n        if ra == rb:\n            return False\n        if self.rank[ra] < self.rank[rb]:\n            self.parent[ra] = rb\n        elif self.rank[ra] > self.rank[rb]:\n            self.parent[rb] = ra\n        else:\n            self.parent[rb] = ra\n            self.rank[ra] += 1\n        return True\n\n常用技巧：维护连通分量数量 components\n- 初始 components = n\n- 每次 union 成功（返回 True） => components -= 1\n\n====================\n八、常见题怎么套\n====================\n1) Connected Components：\n- components = n\n- 每条边 union 成功 => components -= 1\n- return components\n\n2) Redundant Connection：\n- 从左到右 union\n- 第一次/最后一次 union 失败的边就是成环边（按题意取最后）\n\n3) Valid Tree：\n- 必须 edges == n-1\n- 然后 union，若出现失败 => False\n- 全部成功 => True\n\n====================\n九、复杂度（记一句就行）\n====================\n带路径压缩 + rank：\n- 每次操作几乎 O(1)\n- 严格是 O(α(n))，α(n) 极慢增长，实际可当常数\n",
-    "check": "问1：并查集最核心的两个操作是什么？分别做什么？\n答：find(x) 找 x 所属集合的“老大/根”；union(a,b) 把 a、b 所在的两个集合合并。\n\n问2：为什么在无向图里，如果 find(a) == find(b)，再加边 (a,b) 会成环？\n答：因为 find(a)==find(b) 说明 a 与 b 已经存在一条路径连通；再加一条直接边会把这条路径闭合成一个圈，所以一定出现环。\n\n问3：路径压缩是干什么的？为什么能变快？\n答：find(x) 找到根后，把 x 以及沿途节点直接指向根，后续 find 几乎一步到根，重复查询速度大幅提升。\n\n问4：rank 是什么？合并时为什么要用 rank？\n答：rank 可理解为树的大概高度。合并时让矮树挂到高树，避免树变成很长的链，从而让 find 更快。只有两棵树 rank 相同，合并后新树高度才会 +1。\n\n问5：在“连通分量数量”问题中，如何用并查集得到答案？\n答：初始 components=n；遍历每条边，若 union 成功（两个集合原本不同），components -= 1；最终 components 就是连通分量数量。\n\n问6：节点编号是 1..n 时，parent 数组长度应该怎么开？\n答：开 n+1（忽略 0 号），parent = list(range(n+1))，避免越界。",
     "tags": [
       "union_find",
       "dsu",
@@ -772,8 +690,6 @@
     "type": "pattern",
     "topic": "idempotency",
     "difficulty": 2,
-    "front": "Idempotency means repeating a request has the same effect as doing it once. Use idempotency keys for create operations so retries do not duplicate work. Store the key with the result and return the cached response on repeats.",
-    "check": "Where would you store idempotency keys and how long would you keep them?",
     "tags": [
       "reliability"
     ],
@@ -789,8 +705,6 @@
     "type": "pattern",
     "topic": "networking_basics",
     "difficulty": 2,
-    "front": "In system design, networking defines how independent services communicate across machines. Understanding basic networking concepts helps you reason about latency, reliability, scalability, and failure modes in distributed systems.",
-    "check": "Why is networking knowledge essential even if your system design focuses on high-level architecture?",
     "tags": [
       "networking",
       "distributed_systems"
@@ -807,8 +721,6 @@
     "type": "pattern",
     "topic": "network_layers",
     "difficulty": 3,
-    "front": "System designers usually reason about networking using layers. The most relevant ones are: the Network layer (IP routing), the Transport layer (TCP/UDP/QUIC reliability and ordering), and the Application layer (HTTP, gRPC, WebSockets). Each layer provides guarantees that affect system behavior.",
-    "check": "Which networking layer is responsible for reliability and ordering, and why does that matter in system design?",
     "tags": [
       "osi",
       "tcp_ip"
@@ -825,8 +737,6 @@
     "type": "micro",
     "topic": "network_layer",
     "difficulty": 2,
-    "front": "The network layer (IP) is responsible for addressing and routing packets across networks. It does not guarantee delivery, ordering, or reliability. System designers usually assume the network can drop, duplicate, or reorder packets.",
-    "check": "What guarantees does the network (IP) layer NOT provide?",
     "tags": [
       "ip",
       "routing"
@@ -843,8 +753,6 @@
     "type": "pattern",
     "topic": "transport_protocols",
     "difficulty": 3,
-    "front": "The transport layer defines how data is delivered between services. TCP provides reliable, ordered, congestion-controlled delivery. UDP provides best-effort, unordered delivery with lower overhead. System designers choose between them based on reliability vs latency tradeoffs.",
-    "check": "Why is TCP usually assumed in system design interviews unless stated otherwise?",
     "tags": [
       "tcp",
       "udp"
@@ -861,8 +769,6 @@
     "type": "pattern",
     "topic": "application_protocols",
     "difficulty": 2,
-    "front": "Application-layer protocols define how services communicate logically. Common examples include HTTP/HTTPS for request-response APIs, gRPC for RPC-style communication, and WebSockets for long-lived connections. These protocols build on transport-layer guarantees.",
-    "check": "Why do application protocols rely on transport-layer guarantees instead of reimplementing them?",
     "tags": [
       "http",
       "grpc",
@@ -880,8 +786,6 @@
     "type": "pattern",
     "topic": "request_lifecycle",
     "difficulty": 3,
-    "front": "When a user accesses a website, the request typically goes through DNS resolution, a TCP handshake, an HTTP request-response exchange, and a connection teardown or reuse. Each step contributes to latency and failure possibilities.",
-    "check": "Which steps in a web request contribute most to latency, and why?",
     "tags": [
       "dns",
       "http",
@@ -899,8 +803,6 @@
     "type": "micro",
     "topic": "dns",
     "difficulty": 2,
-    "front": "DNS maps human-readable domain names to IP addresses. It introduces additional network hops and latency, but also enables load balancing, service discovery, and infrastructure flexibility.",
-    "check": "Why is DNS not just a lookup table, but a design component?",
     "tags": [
       "dns",
       "load_balancing"
@@ -917,8 +819,6 @@
     "type": "pattern",
     "topic": "networking_interview_expectations",
     "difficulty": 2,
-    "front": "In system design interviews, you are not expected to implement networking protocols, but you should understand how networking choices affect latency, reliability, scalability, and system tradeoffs.",
-    "check": "What level of networking detail is expected in a system design interview?",
     "tags": [
       "interview",
       "networking"
@@ -935,8 +835,6 @@
     "type": "pattern",
     "topic": "api_core_concepts",
     "difficulty": 3,
-    "front": "API design in system design interviews involves choosing a communication protocol (e.g., REST, GraphQL, RPC), defining clear resource structures, and specifying how clients send data and receive responses in a consistent and scalable way.",
-    "check": "What are the trade-offs between choosing REST, GraphQL, and RPC for an API?",
     "tags": [
       "api",
       "protocol"
@@ -953,8 +851,6 @@
     "type": "micro",
     "topic": "api_rest",
     "difficulty": 2,
-    "front": "REST (Representational State Transfer) uses HTTP methods (GET, POST, PUT, DELETE) and resource-oriented URLs. It emphasizes statelessness, clear resource structure, and use of standard status codes to communicate result semantics.",
-    "check": "Why should GET be idempotent and what does that imply for API design?",
     "tags": [
       "api",
       "rest",
@@ -972,8 +868,6 @@
     "type": "micro",
     "topic": "api_graphql",
     "difficulty": 3,
-    "front": "GraphQL lets clients request exactly the fields they need in a single query. It can reduce overfetching and underfetching compared to REST, but requires a schema and resolver layer that the server must maintain.",
-    "check": "What problem does GraphQL solve compared to traditional REST APIs?",
     "tags": [
       "api",
       "graphql"
@@ -990,8 +884,6 @@
     "type": "micro",
     "topic": "api_rpc",
     "difficulty": 3,
-    "front": "RPC (Remote Procedure Call) APIs (e.g., gRPC) let clients invoke service functions directly with typed interfaces. They often use HTTP/2 and Protobuf, enabling efficient binary communication and strong typing between services.",
-    "check": "Why might gRPC be preferred over REST in microservice-to-microservice communication?",
     "tags": [
       "api",
       "rpc",
@@ -1009,8 +901,6 @@
     "type": "micro",
     "topic": "api_pagination",
     "difficulty": 2,
-    "front": "Pagination helps APIs return large result sets in manageable chunks. Strategies include offset-based and cursor-based pagination. Cursor-based tends to scale better because it avoids deep offsets and reduces inconsistent paging on changing datasets.",
-    "check": "Why is cursor-based pagination generally more scalable than offset pagination?",
     "tags": [
       "api",
       "pagination",
@@ -1028,8 +918,6 @@
     "type": "micro",
     "topic": "api_versioning",
     "difficulty": 2,
-    "front": "API versioning ensures backward compatibility as APIs evolve. Common approaches include using versioned URLs (e.g., /v1/users) or media type versioning. Clear versioning prevents breaking existing clients when new fields or behavior are introduced.",
-    "check": "What are two common API versioning strategies and why are they important?",
     "tags": [
       "api",
       "versioning"
@@ -1046,8 +934,6 @@
     "type": "micro",
     "topic": "api_auth_security",
     "difficulty": 3,
-    "front": "Security in API design includes authentication (verifying who is calling) and authorization (what they can do). Common methods include API keys, OAuth2/JWT for tokens, and HTTPS for transport encryption to protect data in transit.",
-    "check": "What is the difference between authentication and authorization in API design?",
     "tags": [
       "api",
       "security",
@@ -1065,8 +951,6 @@
     "type": "micro",
     "topic": "api_rate_limiting",
     "difficulty": 2,
-    "front": "Rate limiting protects APIs from abuse and ensures fair use. Techniques include fixed window, sliding window, and token bucket algorithms. They help maintain service quality and prevent resource exhaustion.",
-    "check": "What is the purpose of rate limiting and name one common algorithm to implement it?",
     "tags": [
       "api",
       "rate_limiting"
