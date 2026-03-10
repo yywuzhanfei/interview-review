@@ -37,7 +37,14 @@ type ReviewState = {
   entries: Record<string, ReviewEntry>;
 };
 
+type DailySession = {
+  date: string;
+  queue: string[];
+  doneCount: number;
+};
+
 const STORAGE_KEY = "algo-pocket-review-v1";
+const SESSION_KEY = "algo-pocket-review-session-v1";
 const NEW_DAILY_LIMIT = 15;
 const DUE_DAILY_LIMIT = 80;
 
@@ -73,6 +80,33 @@ function loadState(): ReviewState {
 function saveState(state: ReviewState) {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function getTodayKeyPT() {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Los_Angeles",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
+
+function loadDailySession(): DailySession | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(SESSION_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as DailySession;
+    if (!parsed?.date || !Array.isArray(parsed?.queue)) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function saveDailySession(session: DailySession) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(SESSION_KEY, JSON.stringify(session));
 }
 
 function nextEntry(prev: ReviewEntry, grade: Grade): ReviewEntry {
@@ -163,10 +197,21 @@ export default function Home() {
   const [showAnswer, setShowAnswer] = useState(false);
   const [doneCount, setDoneCount] = useState(0);
   const [sessionStarted, setSessionStarted] = useState(false);
+  const [bootstrapped, setBootstrapped] = useState(false);
 
   useEffect(() => {
     const loaded = loadState();
     setState(loaded);
+
+    const today = getTodayKeyPT();
+    const session = loadDailySession();
+    if (session && session.date === today) {
+      setQueue(session.queue);
+      setDoneCount(session.doneCount || 0);
+      setSessionStarted(true);
+    }
+
+    setBootstrapped(true);
   }, []);
 
   useEffect(() => {
@@ -207,12 +252,21 @@ export default function Home() {
   }, [state.entries]);
 
   useEffect(() => {
-    if (sessionStarted) return;
+    if (!bootstrapped || sessionStarted) return;
     setQueue(reviewPlan.queueIds);
     setDoneCount(0);
     setShowAnswer(false);
     setSessionStarted(true);
-  }, [reviewPlan.queueIds.join("|"), sessionStarted]);
+  }, [reviewPlan.queueIds.join("|"), sessionStarted, bootstrapped]);
+
+  useEffect(() => {
+    if (!bootstrapped || !sessionStarted) return;
+    saveDailySession({
+      date: getTodayKeyPT(),
+      queue,
+      doneCount,
+    });
+  }, [queue, doneCount, sessionStarted, bootstrapped]);
 
   const currentCard = useMemo(() => {
     const id = queue[0];
