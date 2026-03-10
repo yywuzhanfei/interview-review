@@ -162,6 +162,7 @@ export default function Home() {
   const [queue, setQueue] = useState<string[]>([]);
   const [showAnswer, setShowAnswer] = useState(false);
   const [doneCount, setDoneCount] = useState(0);
+  const [sessionStarted, setSessionStarted] = useState(false);
 
   useEffect(() => {
     const loaded = loadState();
@@ -206,15 +207,31 @@ export default function Home() {
   }, [state.entries]);
 
   useEffect(() => {
+    if (sessionStarted) return;
     setQueue(reviewPlan.queueIds);
     setDoneCount(0);
     setShowAnswer(false);
-  }, [reviewPlan.queueIds.join("|")]);
+    setSessionStarted(true);
+  }, [reviewPlan.queueIds.join("|"), sessionStarted]);
 
   const currentCard = useMemo(() => {
     const id = queue[0];
     return allCards.find((c) => c.id === id) || null;
   }, [queue]);
+
+  const queueStats = useMemo(() => {
+    const now = Date.now();
+    let due = 0;
+    let fresh = 0;
+
+    for (const id of queue) {
+      const e = state.entries[id];
+      if (!e?.nextReviewAt) fresh += 1;
+      else if (e.nextReviewAt <= now) due += 1;
+    }
+
+    return { due, fresh };
+  }, [queue, state.entries]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -292,8 +309,8 @@ export default function Home() {
         {tab === "review" ? (
           <section className="space-y-3">
             <div className="grid grid-cols-3 gap-2 text-xs md:text-sm">
-              <div className="rounded-lg border border-slate-800 bg-slate-900 p-3">Due: {reviewPlan.due.length}</div>
-              <div className="rounded-lg border border-slate-800 bg-slate-900 p-3">New: {reviewPlan.fresh.length}</div>
+              <div className="rounded-lg border border-slate-800 bg-slate-900 p-3">Due: {queueStats.due}</div>
+              <div className="rounded-lg border border-slate-800 bg-slate-900 p-3">New: {queueStats.fresh}</div>
               <div className="rounded-lg border border-slate-800 bg-slate-900 p-3">Done: {doneCount}</div>
             </div>
 
