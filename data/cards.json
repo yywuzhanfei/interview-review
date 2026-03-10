@@ -996,5 +996,23 @@
     "front_zh": "Combination Sum II 的核心模式：回溯 + 排序 + 同层去重。\n\n问题特点：\n- 每个元素最多使用一次\n- 数组中可能有重复数字\n- 结果组合不能重复\n\n====================\n核心策略\n====================\n\n1) 先排序（让相同元素相邻，便于去重）\n\n```python\ncandidates.sort()\n```\n\n2) 回溯搜索组合\n- path：当前组合\n- remain：剩余目标和\n- start：下一层搜索起点\n\n3) 同层去重（关键）\n\n```python\nif i > start and candidates[i] == candidates[i - 1]:\n    continue\n```\n\n含义：同一层 DFS 中，如果当前元素和前一个一样，就跳过，避免生成重复组合。\n\n====================\n回溯模板\n====================\n\n```python\ndef combinationSum2(candidates, target):\n    candidates.sort()\n\n    res = []\n    path = []\n\n    def backtrack(start, remain):\n        if remain == 0:\n            res.append(path[:])\n            return\n\n        for i in range(start, len(candidates)):\n            if i > start and candidates[i] == candidates[i - 1]:\n                continue\n\n            if candidates[i] > remain:\n                break\n\n            path.append(candidates[i])\n            backtrack(i + 1, remain - candidates[i])\n            path.pop()\n\n    backtrack(0, target)\n    return res\n```\n\n====================\n为什么递归用 i+1\n====================\n\n因为每个元素只能使用一次。\n如果递归传 i，就会允许同一位置被重复使用。\n\n====================\n示例\n====================\n\n输入：\n```text\ncandidates = [1,2,2,4,5,6,9]\ntarget = 8\n```\n\n合法组合：\n```text\n[1,2,5]\n[2,2,4]\n[2,6]\n```\n\n====================\n记忆口诀\n====================\n\n组合 + 重复元素 -> 排序 + 同层去重 + 递归 i+1",
     "check_q_en": "Why do we need the condition `if i > start and candidates[i] == candidates[i-1]` in Combination Sum II?",
     "check_a_en": "Because the array is sorted, equal numbers appear next to each other. If we allow both in the same recursion level, they would generate identical combinations. The condition ensures that for the same DFS level, only the first occurrence is used, preventing duplicate combinations while still allowing duplicates across deeper levels."
+  },
+  {
+    "id": "algo-0045",
+    "domain": "algo",
+    "type": "pattern",
+    "topic": "backtracking_subsets_with_duplicates_same_level_dedup",
+    "difficulty": 3,
+    "tags": [
+      "backtracking",
+      "dfs",
+      "subsets",
+      "dedup"
+    ],
+    "cooldown_hours": 24,
+    "is_active": true,
+    "front_zh": "Subsets II 的核心模式：回溯 + 排序 + 同层去重。\n\n问题特点：\n- 数组可能包含重复元素\n- 需要返回所有子集\n- 结果中不能包含重复子集\n\n====================\n核心策略\n====================\n\n1) 先排序\n\n```python\nnums.sort()\n```\n\n排序后，相同元素会相邻，方便做去重判断。\n\n2) 回溯枚举所有子集\n\n维护：\n- path：当前子集\n- start：下一层可选择起点\n\n子集题特点：每一个 path 本身就是合法答案，所以递归进入时先记录结果。\n\n3) 同层去重（关键）\n\n```python\nif i > start and nums[i] == nums[i - 1]:\n    continue\n```\n\n含义：若当前元素与前一个相同，且处于同一层 DFS，则跳过，避免重复子集。\n\n====================\n回溯模板\n====================\n\n```python\ndef subsetsWithDup(nums):\n    nums.sort()\n\n    res = []\n    path = []\n\n    def backtrack(start):\n        res.append(path[:])\n\n        for i in range(start, len(nums)):\n            if i > start and nums[i] == nums[i - 1]:\n                continue\n\n            path.append(nums[i])\n            backtrack(i + 1)\n            path.pop()\n\n    backtrack(0)\n    return res\n```\n\n====================\n示例\n====================\n\n输入：\n```text\nnums = [1,2,1]\n```\n\n排序后：\n```text\n[1,1,2]\n```\n\n输出子集：\n```text\n[]\n[1]\n[1,1]\n[1,1,2]\n[1,2]\n[2]\n```\n\n====================\n为什么使用 i > start\n====================\n\n该条件表示只在“同一层”去重。\n这样 [1,1] 仍能生成（来自不同递归层）。\n若写成 i > 0，会错误跳过合法结果。\n\n====================\n记忆口诀\n====================\n\n子集 + 重复元素 -> 排序 + 同层去重",
+    "check_q_en": "Why do we use the condition `if i > start and nums[i] == nums[i-1]` in Subsets II?",
+    "check_a_en": "Because the array is sorted, equal numbers appear next to each other. If we choose both in the same DFS level, they would generate identical subsets. The condition ensures that duplicates are skipped only within the same recursion level, preventing duplicate subsets while still allowing duplicates across deeper levels."
   }
 ]
