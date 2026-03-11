@@ -1014,5 +1014,23 @@
     "front_zh": "Subsets II 的核心模式：回溯 + 排序 + 同层去重。\n\n问题特点：\n- 数组可能包含重复元素\n- 需要返回所有子集\n- 结果中不能包含重复子集\n\n====================\n核心策略\n====================\n\n1) 先排序\n\n```python\nnums.sort()\n```\n\n排序后，相同元素会相邻，方便做去重判断。\n\n2) 回溯枚举所有子集\n\n维护：\n- path：当前子集\n- start：下一层可选择起点\n\n子集题特点：每一个 path 本身就是合法答案，所以递归进入时先记录结果。\n\n3) 同层去重（关键）\n\n```python\nif i > start and nums[i] == nums[i - 1]:\n    continue\n```\n\n含义：若当前元素与前一个相同，且处于同一层 DFS，则跳过，避免重复子集。\n\n====================\n回溯模板\n====================\n\n```python\ndef subsetsWithDup(nums):\n    nums.sort()\n\n    res = []\n    path = []\n\n    def backtrack(start):\n        res.append(path[:])\n\n        for i in range(start, len(nums)):\n            if i > start and nums[i] == nums[i - 1]:\n                continue\n\n            path.append(nums[i])\n            backtrack(i + 1)\n            path.pop()\n\n    backtrack(0)\n    return res\n```\n\n====================\n示例\n====================\n\n输入：\n```text\nnums = [1,2,1]\n```\n\n排序后：\n```text\n[1,1,2]\n```\n\n输出子集：\n```text\n[]\n[1]\n[1,1]\n[1,1,2]\n[1,2]\n[2]\n```\n\n====================\n为什么使用 i > start\n====================\n\n该条件表示只在“同一层”去重。\n这样 [1,1] 仍能生成（来自不同递归层）。\n若写成 i > 0，会错误跳过合法结果。\n\n====================\n记忆口诀\n====================\n\n子集 + 重复元素 -> 排序 + 同层去重",
     "check_q_en": "Why do we use the condition `if i > start and nums[i] == nums[i-1]` in Subsets II?",
     "check_a_en": "Because the array is sorted, equal numbers appear next to each other. If we choose both in the same DFS level, they would generate identical subsets. The condition ensures that duplicates are skipped only within the same recursion level, preventing duplicate subsets while still allowing duplicates across deeper levels."
+  },
+  {
+    "id": "algo-0046",
+    "domain": "algo",
+    "type": "pattern",
+    "topic": "backtracking_generate_parentheses_constraints",
+    "difficulty": 3,
+    "tags": [
+      "backtracking",
+      "dfs",
+      "parentheses",
+      "constraint_search"
+    ],
+    "cooldown_hours": 24,
+    "is_active": true,
+    "front_zh": "Generate Parentheses 的核心模式：回溯 + 前缀合法性约束。\n\n问题特点：\n- 需要生成所有合法括号序列\n- 一共有 n 对括号\n- 每个序列长度为 2n\n\n====================\n核心思想\n====================\n\n回溯生成字符串，但必须保证任何时刻前缀都合法。\n\n维护两个计数：\n- left = 已使用的 '(' 数量\n- right = 已使用的 ')' 数量\n\n====================\n两个关键约束\n====================\n\n1) 左括号数量不能超过 n\n\n```python\nleft < n\n```\n\n2) 右括号数量不能超过左括号\n\n```python\nright < left\n```\n\n含义：只有当前还有未闭合的 '(' 时，才能放 ')'。\n否则会产生非法前缀，例如：\")(\" 或 \"())\"。\n\n====================\n回溯模板\n====================\n\n```python\ndef generateParenthesis(n):\n    res = []\n    path = []\n\n    def backtrack(left, right):\n        if len(path) == 2 * n:\n            res.append(\"\".join(path))\n            return\n\n        if left < n:\n            path.append(\"(\")\n            backtrack(left + 1, right)\n            path.pop()\n\n        if right < left:\n            path.append(\")\")\n            backtrack(left, right + 1)\n            path.pop()\n\n    backtrack(0, 0)\n    return res\n```\n\n====================\n示例\n====================\n\n输入：\n```text\nn = 3\n```\n\n输出：\n```text\n((()))\n(()())\n(())()\n()(())\n()()()\n```\n\n====================\n搜索过程理解\n====================\n\n构造括号串时，每一步都尝试：\n- 放 '('\n- 放 ')'\n\n但必须满足：\n- left < n\n- right < left\n\n这样会在搜索过程中剪掉所有非法分支。\n\n====================\n记忆口诀\n====================\n\n左括号没用完 -> 可以放 '('\n还有未闭合括号 -> 可以放 ')'",
+    "check_q_en": "Why must we enforce the condition `right < left` when generating parentheses?",
+    "check_a_en": "Because a valid parentheses string can never have more closing brackets than opening brackets at any prefix. If `right >= left`, adding another ')' would create an invalid prefix such as ')(' or '())'. The condition ensures that we only close parentheses that have already been opened."
   }
 ]
