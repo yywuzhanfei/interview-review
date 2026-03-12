@@ -1070,5 +1070,23 @@
     "front_zh": "Rotate Image（顺时针旋转矩阵 90°）的核心模式：Transpose + Reverse。\n\n问题特点：\n- 输入是 n × n 的正方形矩阵\n- 需要顺时针旋转 90°\n- 必须 in-place（不能新建矩阵）\n\n====================\n核心思想\n====================\n\n顺时针旋转 90° 可拆成两步：\n1) 转置矩阵（Transpose）\n2) 每一行反转（Reverse each row）\n\n====================\n步骤 1：矩阵转置\n====================\n\n沿主对角线交换：\n```python\nmatrix[i][j] <-> matrix[j][i]\n```\n\n示例：\n```text\n原矩阵:\n1 2 3\n4 5 6\n7 8 9\n\n转置后:\n1 4 7\n2 5 8\n3 6 9\n```\n\n实现：\n```python\nfor i in range(n):\n    for j in range(i + 1, n):\n        matrix[i][j], matrix[j][i] = matrix[j][i], matrix[i][j]\n```\n\n注意：j 从 i+1 开始，避免重复交换。\n\n====================\n步骤 2：每一行反转\n====================\n\n```python\nfor row in matrix:\n    row.reverse()\n```\n\n示例：\n```text\n转置后:\n1 4 7\n2 5 8\n3 6 9\n\n每行反转后:\n7 4 1\n8 5 2\n9 6 3\n```\n\n这正是顺时针旋转 90° 的结果。\n\n====================\n完整代码\n====================\n\n```python\ndef rotate(matrix):\n    n = len(matrix)\n\n    # 1) transpose\n    for i in range(n):\n        for j in range(i + 1, n):\n            matrix[i][j], matrix[j][i] = matrix[j][i], matrix[i][j]\n\n    # 2) reverse each row\n    for row in matrix:\n        row.reverse()\n```\n\n====================\n坐标变化理解\n====================\n\n顺时针旋转 90°：\n```text\n(i, j) -> (j, n-1-i)\n```\n\n两步法刚好实现：\n```text\nTranspose:    (i, j) -> (j, i)\nReverse row:  (j, i) -> (j, n-1-i)\n```\n\n====================\n复杂度\n====================\n\n- 时间复杂度：O(n²)\n- 空间复杂度：O(1)\n\n====================\n记忆口诀\n====================\n\n矩阵顺时针旋转 90° = Transpose + Reverse each row",
     "check_q_en": "Why does rotating a matrix 90 degrees clockwise equal \"transpose + reverse each row\"?",
     "check_a_en": "Because a 90° clockwise rotation maps coordinates (i, j) to (j, n-1-i). Transposing first swaps (i, j) to (j, i). Reversing each row then moves (j, i) to (j, n-1-i). The two operations together produce exactly the desired rotation while modifying the matrix in-place."
+  },
+  {
+    "id": "algo-0049",
+    "domain": "algo",
+    "type": "pattern",
+    "topic": "tree_build_from_preorder_inorder",
+    "difficulty": 3,
+    "tags": [
+      "tree",
+      "recursion",
+      "divide_and_conquer",
+      "binary_tree"
+    ],
+    "cooldown_hours": 24,
+    "is_active": true,
+    "front_zh": "从 Preorder + Inorder 构建二叉树（Build Binary Tree from Preorder and Inorder Traversal）。\n\n问题特点：\n- 给定 preorder（前序遍历）\n- 给定 inorder（中序遍历）\n- 恢复原二叉树\n\n====================\n核心性质\n====================\n\n前序遍历（preorder）：\n```text\nroot -> left -> right\n```\n\n因此：`preorder[0]` 一定是当前子树的根。\n\n中序遍历（inorder）：\n```text\nleft -> root -> right\n```\n\n因此在 inorder 中：\n- root 左边全是左子树\n- root 右边全是右子树\n\n====================\n构建逻辑\n====================\n\n1) 取根节点\n```python\nroot_val = preorder[0]\n```\n\n2) 找 root 在 inorder 的位置\n```python\nmid = inorder.index(root_val)\n```\n\n3) 切分左右子树\n```text\n左子树:\n  preorder[1:mid+1]\n  inorder[:mid]\n\n右子树:\n  preorder[mid+1:]\n  inorder[mid+1:]\n```\n\n====================\n递归模板\n====================\n\n```python\ndef buildTree(preorder, inorder):\n    if not preorder:\n        return None\n\n    root_val = preorder[0]\n    root = TreeNode(root_val)\n\n    mid = inorder.index(root_val)\n\n    root.left = buildTree(\n        preorder[1:mid+1],\n        inorder[:mid]\n    )\n\n    root.right = buildTree(\n        preorder[mid+1:],\n        inorder[mid+1:]\n    )\n\n    return root\n```\n\n====================\n示例\n====================\n\n```text\npreorder = [3,9,20,15,7]\ninorder  = [9,3,15,20,7]\n```\n\n步骤：\n```text\nroot = 3\ninorder 切分: [9] | 3 | [15,20,7]\n\n左子树:\n  preorder = [9]\n  inorder  = [9]\n\n右子树:\n  preorder = [20,15,7]\n  inorder  = [15,20,7]\n```\n\n====================\n为什么左子树是 preorder[1:mid+1]\n====================\n\n因为：\n- `mid` = 左子树节点数\n- preorder 结构是：`root | left subtree | right subtree`\n\n所以 root 后面连续的 `mid` 个节点就是左子树。\n\n====================\n复杂度\n====================\n\n- 直接写法：O(n²)（每次递归都做 `inorder.index`）\n- 优化：预建 `value -> index` 哈希表，可降为 O(n)\n\n====================\n记忆口诀\n====================\n\nPreorder 找 root\nInorder 切左右\n递归构建子树",
+    "check_q_en": "Why does preorder[1:mid+1] represent the left subtree when reconstructing a binary tree from preorder and inorder?",
+    "check_a_en": "Because preorder traversal visits nodes as root -> left -> right. The root is preorder[0]. In the inorder array, the root splits the tree into left and right subtrees. The number of nodes in the left subtree equals `mid`. Therefore the next `mid` elements in preorder must correspond to the left subtree."
   }
 ]
