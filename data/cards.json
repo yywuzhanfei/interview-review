@@ -1143,5 +1143,22 @@
     "front_zh": "XOR（异或）在算法中的经典用途：配对抵消（Pair Cancellation）。\n\n很多题会给出：\n- 每个元素出现两次\n- 只有一个元素出现一次\n\n例如：`nums = [7,6,6,7,8]`，求唯一元素。\n\n====================\nXOR 的三个关键性质\n====================\n\n1) 相同数字 XOR 为 0\n```python\na ^ a = 0\n```\n\n2) 任何数字 XOR 0 等于自身\n```python\na ^ 0 = a\n```\n\n3) XOR 满足交换律和结合律\n```python\na ^ b ^ c = c ^ a ^ b\n```\n\n====================\n为什么 XOR 可行\n====================\n\n对数组全部异或：\n```python\n7 ^ 6 ^ 6 ^ 7 ^ 8\n```\n\n重排后：\n```python\n(7 ^ 7) ^ (6 ^ 6) ^ 8\n```\n\n配对抵消：\n```python\n0 ^ 0 ^ 8\n```\n\n最终：\n```python\n8\n```\n\n====================\n算法实现\n====================\n\n```python\ndef singleNumber(nums):\n    res = 0\n    for n in nums:\n        res ^= n\n    return res\n```\n\n====================\n复杂度\n====================\n\n- 时间复杂度：O(n)\n- 空间复杂度：O(1)\n\n====================\n何时想到 XOR\n====================\n\n看到以下特征就要警觉：\n1) 大部分元素成对出现\n2) 只有一个/少数元素不成对\n3) 要求 O(1) 额外空间\n\n典型描述：\n```text\nevery element appears twice except one\n```\n\n====================\n直觉理解\n====================\n\nXOR 的直觉：\n“相同就抵消，不同就留下”。\n\n====================\n常见相关题\n====================\n\n- Single Number\n- Single Number II\n- Single Number III\n- Missing Number\n\n====================\n记忆口诀\n====================\n\n成对出现\nXOR 抵消\n剩下唯一",
     "check_q_en": "Why can XOR be used to find the single number when every other element appears twice?",
     "check_a_en": "Because XOR has the properties a ^ a = 0 and a ^ 0 = a. When XOR is applied to all numbers, all paired elements cancel each other out, leaving only the number that appears once."
+  },
+  {
+    "id": "algo-0053",
+    "domain": "algo",
+    "type": "pattern",
+    "topic": "bitwise_remove_lowest_set_bit",
+    "difficulty": 2,
+    "tags": [
+      "bitwise",
+      "hamming_weight",
+      "bit_manipulation"
+    ],
+    "cooldown_hours": 24,
+    "is_active": true,
+    "front_zh": "位运算技巧：`n & (n-1)` 用于移除二进制中最右侧的 1（lowest set bit）。\n\n常见问题：\n- 统计二进制中 1 的个数（Hamming Weight）\n- Number of 1 Bits\n\n====================\n核心性质\n====================\n\n对任意整数 n：\n```python\nn & (n - 1)\n```\n\n会把 n 的二进制中“最右侧的 1”清零。\n\n====================\n示例\n====================\n\n```text\nn   = 1011000\nn-1 = 1010111\nAND = 1010000\n```\n\n可以看到，最右侧的 1 被消除了。\n\n====================\n算法应用\n====================\n\n统计 1 的数量：每执行一次 `n &= (n-1)`，就消掉一个 1。\n\n====================\n代码模板\n====================\n\n```python\ndef hammingWeight(n):\n    count = 0\n    while n:\n        n &= (n - 1)\n        count += 1\n    return count\n```\n\n====================\n示例运行\n====================\n\n```text\nn = 10111\n\n10111 -> 10110\n10110 -> 10100\n10100 -> 10000\n10000 -> 00000\n```\n\n共执行 4 次，说明有 4 个 1。\n\n====================\n复杂度\n====================\n\n- 时间复杂度：O(number of 1 bits)\n- 最坏情况（32 位整数）：O(32)\n- 空间复杂度：O(1)\n\n====================\n与普通方法对比\n====================\n\n普通方法（逐位检查）：\n```python\nwhile n:\n    count += n & 1\n    n >>= 1\n```\n\n需要检查每一位。\n\n而 `n & (n-1)` 只循环“1 的个数”次，常更快。\n\n====================\n相关位运算技巧\n====================\n\n1) XOR 抵消\n```python\nx ^ x = 0\n```\n用于：Single Number\n\n2) 移除最低位 1\n```python\nx & (x - 1)\n```\n用于：Number of 1 Bits\n\n3) 获取最低位 1\n```python\nx & -x\n```\n用于：位掩码 / Fenwick Tree\n\n====================\n记忆口诀\n====================\n\n`n & (n-1)`：每次消掉一个 1。",
+    "check_q_en": "Why does the operation `n & (n-1)` remove the lowest set bit in a number?",
+    "check_a_en": "When subtracting 1 from a number, all bits after the lowest set bit become 1 and the lowest set bit itself becomes 0. Performing AND with the original number keeps higher bits unchanged but clears that lowest set bit, effectively removing it."
   }
 ]
